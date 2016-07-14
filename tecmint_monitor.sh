@@ -1,17 +1,16 @@
-                  ####################################################################################################
-                  #                                        Tecmint_monitor.sh                                        #
-                  # Written for Tecmint.com for the post www.tecmint.com/linux-server-health-monitoring-script/      #
-                  # If any bug, report us in the link below                                                          #
-                  # Free to use/edit/distribute the code below by                                                    #
-                  # giving proper credit to Tecmint.com and Author                                                   #
-                  #                                                                                                  #
-                  ####################################################################################################
-#! /bin/bash
-# unset any variable which system may be using
+#!/bin/sh
+####################################################################################################
+#                                        Tecmint_monitor.sh                                        #
+# Written for Tecmint.com for the post www.tecmint.com/linux-server-health-monitoring-script/      #
+# If any bug, report us in the link below                                                          #
+# Free to use/edit/distribute the code below by                                                    #
+# giving proper credit to Tecmint.com and Author                                                   #
+#                                                                                                  #
+####################################################################################################
 
-# clear the screen
 clear
 
+# unset any variable which system may be using
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
 
 while getopts iv name
@@ -23,21 +22,17 @@ do
         esac
 done
 
-if [[ ! -z $iopt ]]
-then
-{
-wd=$(pwd)
-basename "$(test -L "$0" && readlink "$0" || echo "$0")" > /tmp/scriptname
-scriptname=$(echo -e -n $wd/ && cat /tmp/scriptname)
-su -c "cp $scriptname /usr/bin/monitor" root && echo "Congratulations! Script Installed, now run monitor Command" || echo "Installation failed"
-}
+if [[ ! -z $iopt ]]; then 
+	wd=$(pwd)
+	basename "$(test -L "$0" && readlink "$0" || echo "$0")" > /tmp/scriptname
+	scriptname=$(echo -e -n $wd/ && cat /tmp/scriptname)
+	su -c "cp $scriptname /usr/bin/monitor" root && echo "Congratulations! Script Installed, now run monitor Command" || echo "Installation failed"
+	# cleanup after install
+	rm -f /tmp/scriptname
 fi
 
-if [[ ! -z $vopt ]]
-then
-{
-echo -e "tecmint_monitor version 0.1\nDesigned by Tecmint.com\nReleased Under Apache 2.0 License"
-}
+if [[ ! -z $vopt ]]; then
+	echo -e "tecmint_monitor version 0.1.1\nDesigned by Tecmint.com\nReleased Under Apache 2.0 License"
 fi
 
 if [[ $# -eq 0 ]]
@@ -56,9 +51,14 @@ os=$(uname -o)
 echo -e '\E[32m'"Operating System Type :" $tecreset $os
 
 # Check OS Release Version and Name
-cat /etc/os-release | grep 'NAME\|VERSION' | grep -v 'VERSION_ID' | grep -v 'PRETTY_NAME' > /tmp/osrelease
-echo -n -e '\E[32m'"OS Name :" $tecreset  && cat /tmp/osrelease | grep -v "VERSION" | cut -f2 -d\"
-echo -n -e '\E[32m'"OS Version :" $tecreset && cat /tmp/osrelease | grep -v "NAME" | cut -f2 -d\"
+if [ -f /etc/os-release ]; then 
+	cat /etc/os-release | grep 'NAME\|VERSION' | grep -v 'VERSION_ID' | grep -v 'PRETTY_NAME' > /tmp/osrelease
+	echo -n -e '\E[32m'"OS Name :" $tecreset  && cat /tmp/osrelease | grep -v "VERSION" | cut -f2 -d\"
+	echo -n -e '\E[32m'"OS Version :" $tecreset && cat /tmp/osrelease | grep -v "NAME" | cut -f2 -d\"
+else
+	echo -n -e '\E[32m'"OS Name :"" **** NOT YET AVAILIABLE, Work in Progress ****\n"
+	echo -n -e '\E[32m'"OS Version :"" **** NOT YET AVAILIABLE, Work in Progress ****\n"
+fi
 
 # Check Architecture
 architecture=$(uname -m)
@@ -72,7 +72,7 @@ echo -e '\E[32m'"Kernel Release :" $tecreset $kernelrelease
 echo -e '\E[32m'"Hostname :" $tecreset $HOSTNAME
 
 # Check Internal IP
-internalip=$(hostname -I)
+internalip=$(hostname -i)
 echo -e '\E[32m'"Internal IP :" $tecreset $internalip
 
 # Check External IP
@@ -111,7 +111,14 @@ echo -e '\E[32m'"System Uptime Days/(HH:MM) :" $tecreset $tecuptime
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
 
 # Remove Temporary Files
-rm /tmp/osrelease /tmp/who /tmp/ramcache /tmp/diskusage
+temp_files="/tmp/osrelease /tmp/who /tmp/ramcache /tmp/diskusage"
+for i in ${temp_files}; do 
+	# check if file exists prior removing.
+	if [ -f ${i} ]; then
+		rm ${i}
+	fi
+done
+
 }
 fi
 shift $(($OPTIND -1))
