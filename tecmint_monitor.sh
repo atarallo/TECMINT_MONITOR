@@ -23,10 +23,12 @@ do
 done
 
 if [[ ! -z $iopt ]]; then 
+	fail_msg="Installation failed"
+	ok_msg="Congratulations! Script Installed, now run monitor Command"
 	wd=$(pwd)
 	basename "$(test -L "$0" && readlink "$0" || echo "$0")" > /tmp/scriptname
 	scriptname=$(echo -e -n $wd/ && cat /tmp/scriptname)
-	su -c "cp $scriptname /usr/bin/monitor" root && echo "Congratulations! Script Installed, now run monitor Command" || echo "Installation failed"
+	su -c "cp $scriptname /usr/bin/monitor" root && echo ${ok_message} || echo ${fail_msg}
 	# cleanup after install
 	rm -f /tmp/scriptname
 fi
@@ -50,14 +52,15 @@ ping -c 1 google.com &> /dev/null && echo -e '\E[32m'"Internet: $tecreset Connec
 os=$(uname -o)
 echo -e '\E[32m'"Operating System Type :" $tecreset $os
 
+
 # Check OS Release Version and Name
 if [ -f /etc/os-release ]; then 
 	cat /etc/os-release | grep 'NAME\|VERSION' | grep -v 'VERSION_ID' | grep -v 'PRETTY_NAME' > /tmp/osrelease
 	echo -n -e '\E[32m'"OS Name :" $tecreset  && cat /tmp/osrelease | grep -v "VERSION" | cut -f2 -d\"
 	echo -n -e '\E[32m'"OS Version :" $tecreset && cat /tmp/osrelease | grep -v "NAME" | cut -f2 -d\"
 else
-	echo -n -e '\E[32m'"OS Name :"" **** NOT YET AVAILIABLE, Work in Progress ****\n"
-	echo -n -e '\E[32m'"OS Version :"" **** NOT YET AVAILIABLE, Work in Progress ****\n"
+	echo -n -e '\E[32m'"OS Name :"  $tecreset " **** NOT YET AVAILIABLE, Work in Progress ****\n"
+	echo -n -e '\E[32m'"OS Version :" $tecreset " **** NOT YET AVAILIABLE, Work in Progress ****\n"
 fi
 
 # Check Architecture
