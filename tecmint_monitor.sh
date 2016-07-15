@@ -21,6 +21,9 @@ if [ ! -f ${CURL_CMD} ]; then
 	exit 1
 fi
 
+#
+# Parse Command Line arguments
+#
 while getopts iv name
 do
         case $name in
@@ -30,6 +33,9 @@ do
         esac
 done
 
+#
+# Install
+#
 if [[ ! -z $iopt ]]; then 
 	fail_msg="Installation failed"
 	ok_msg="Congratulations! Script Installed, now run monitor Command"
