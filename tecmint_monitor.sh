@@ -59,7 +59,6 @@ fi
 # Monitoring
 #
 if [[ $# -eq 0 ]]; then
-{
 
 
 	# Define Variable tecreset
@@ -103,7 +102,7 @@ if [[ $# -eq 0 ]]; then
 	echo -e '\E[32m'"External IP : $tecreset "$externalip
 
 	# Check DNS
-	nameservers=$(cat /etc/resolv.conf | sed '1 d' | awk '{print $2}')
+	nameservers=$(cat /etc/resolv.conf |grep -v '#'| sed '1 d' | awk '{print $2}')
 	echo -e '\E[32m'"Name Servers :" $tecreset $nameservers 
 
 	# Check Logged In Users
@@ -122,8 +121,8 @@ if [[ $# -eq 0 ]]; then
 	echo -e '\E[32m'"Disk Usages :" $tecreset 
 	cat /tmp/diskusage
 
-	# Check Load Average
-	loadaverage=$(top -n 1 -b | grep "load average:" | awk '{print $10 $11 $12}')
+	# Check Load Average, get data from /proc . This might not work outsude Linux.
+	loadaverage=$(cat /proc/loadavg |  awk '{printf("%s %s %s",$1,$2,$3)}')
 	echo -e '\E[32m'"Load Average :" $tecreset $loadaverage
 
 	# Check System Uptime
@@ -142,6 +141,5 @@ if [[ $# -eq 0 ]]; then
 		fi
 	done
 
-}
 fi
 shift $(($OPTIND -1))
