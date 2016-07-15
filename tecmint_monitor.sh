@@ -71,7 +71,9 @@ if [[ $# -eq 0 ]]; then
 	os=$(uname -o)
 	echo -e '\E[32m'"Operating System Type :" $tecreset $os
 
-
+	release_file=$(ls /etc/*-release|grep -v 'lsb-release')
+	# A flag to handle distro specific ISSUES
+	distro="UNKNOWN-${os}"
 	# Check OS Release Version and Name
 	if [ -f /etc/os-release ]; then 
 		cat /etc/os-release | grep 'NAME\|VERSION' | grep -v 'VERSION_ID' | grep -v 'PRETTY_NAME' > /tmp/osrelease
@@ -110,11 +112,11 @@ if [[ $# -eq 0 ]]; then
 	echo -e '\E[32m'"Logged In users :" $tecreset && cat /tmp/who 
 
 	# Check RAM and SWAP Usages
-	free -h | grep -v + > /tmp/ramcache
+	free -o | grep -v + > /tmp/ramcache
 	echo -e '\E[32m'"Ram Usages :" $tecreset
 	cat /tmp/ramcache | grep -v "Swap"
 	echo -e '\E[32m'"Swap Usages :" $tecreset
-	cat /tmp/ramcache | grep -v "Mem"
+	cat /tmp/ramcache | grep -v "Mem" 
 
 	# Check Disk Usages
 	df -h| grep 'Filesystem\|/dev/sda*' > /tmp/diskusage
