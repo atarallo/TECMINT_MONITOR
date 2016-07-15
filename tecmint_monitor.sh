@@ -1,17 +1,25 @@
 #!/bin/sh
-####################################################################################################
-#                                        Tecmint_monitor.sh                                        #
-# Written for Tecmint.com for the post www.tecmint.com/linux-server-health-monitoring-script/      #
-# If any bug, report us in the link below                                                          #
-# Free to use/edit/distribute the code below by                                                    #
-# giving proper credit to Tecmint.com and Author                                                   #
-#                                                                                                  #
-####################################################################################################
+###############################################################################################
+#                                   Tecmint_monitor.sh                                        #
+# Written for Tecmint.com for the post www.tecmint.com/linux-server-health-monitoring-script/ #
+# If any bug, report us in the link below                                                     #
+# Free to use/edit/distribute the code below by                                               #
+# giving proper credit to Tecmint.com and Author                                              #
+#                                                                                             #
+###############################################################################################
 
 clear
-
 # unset any variable which system may be using
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
+
+#
+# Check for CURL availiability, a dependency of this script
+#
+CURL_CMD=$(which curl)
+if [ ! -f ${CURL_CMD} ]; then
+	echo "CURL not availiable or not installed, fix prior running"
+	exit 1
+fi
 
 while getopts iv name
 do
