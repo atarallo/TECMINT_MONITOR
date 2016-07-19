@@ -112,7 +112,7 @@ if [[ $# -eq 0 ]]; then
 	echo -e '\E[32m'"Logged In users :" $tecreset && cat /tmp/who 
 
 	# Check RAM and SWAP Usages
-	free -o | grep -v + > /tmp/ramcache
+	free -m | grep -v + > /tmp/ramcache
 	echo -e '\E[32m'"Ram Usages :" $tecreset
 	cat /tmp/ramcache | grep -v "Swap"
 	echo -e '\E[32m'"Swap Usages :" $tecreset
