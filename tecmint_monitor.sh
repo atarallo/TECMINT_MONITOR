@@ -15,11 +15,7 @@ unset tecreset os architecture kernelrelease internalip externalip nameserver lo
 #
 # Check for CURL availiability, a dependency of this script
 #
-CURL_CMD=$(which curl)
-if [ ! -f ${CURL_CMD} ]; then
-	echo "CURL not availiable or not installed, fix prior running"
-	exit 1
-fi
+type -P curl > /dev/null || ( echo "CURL not availiable or not installed, fix prior running"; exit 1 )
 
 #
 # Parse Command Line arguments
