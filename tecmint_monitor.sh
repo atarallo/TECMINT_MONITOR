@@ -76,8 +76,15 @@ if [[ $# -eq 0 ]]; then
 		echo -n -e '\E[32m'"OS Name :" $tecreset  && cat /tmp/osrelease | grep -v "VERSION" | grep -v CPE_NAME | cut -f2 -d\"
 		echo -n -e '\E[32m'"OS Version :" $tecreset && cat /tmp/osrelease | grep -v "NAME" | grep -v CT_VERSION | cut -f2 -d\"
 	else
-		echo -n -e '\E[32m'"OS Name :"  $tecreset " **** NOT YET AVAILIABLE, Work in Progress ****\n"
-		echo -n -e '\E[32m'"OS Version :" $tecreset " **** NOT YET AVAILIABLE, Work in Progress ****\n"
+		if [ -f /etc/SuSE-release ]; then
+			OSNAME=$(cat /etc/SuSE-release| head -1)
+			VERSION=$(cat /etc/SuSE-release | grep VERSION | cut -f2 -d'=')
+			echo -n -e '\E[32m'"OS Name :" $tecreset && echo ${OSNAME}
+			echo -n -e '\E[32m'"OS Version :" $tecreset && echo ${VERSION}
+		else 
+			echo -n -e '\E[32m'"OS Name :"  $tecreset " **** NOT YET AVAILIABLE, Work in Progress ****\n"
+			echo -n -e '\E[32m'"OS Version :" $tecreset " **** NOT YET AVAILIABLE, Work in Progress ****\n"
+		fi
 	fi
 
 	# Check Architecture
