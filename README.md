@@ -1,5 +1,6 @@
 # TECMINT_MONITOR
-A Shell Script to Monitor : Network, Disk Usage, Uptime, Load Average and RAM for Linux Distros. 
+A Shell Script to Monitor Network, Disk Usage, Uptime, Load Average and RAM
+usage in Linux. 
 
 # USAGE
 
