@@ -109,6 +109,8 @@ if [[ $# -eq 0 ]]; then
 	# Check OS Type
 	os=$(uname -o)
 	echo -e '\E[32m'"Operating System Type :" $tecreset $os
+	echo -e '\E[32m'"OS Name :" $tecreset $OSSTR
+	echo -e '\E[32m'"OS Version" $tecreset ${REV}
 
 	# Check Architecture
 	architecture=$(uname -m)
