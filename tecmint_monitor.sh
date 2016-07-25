@@ -104,11 +104,11 @@ if [[ $# -eq 0 ]]; then
 	fi
 
 	OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
+	OS=$(uname -o)
 
 	fi
 	# Check OS Type
-	os=$(uname -o)
-	echo -e '\E[32m'"Operating System Type :" $tecreset $os
+	echo -e '\E[32m'"Operating System Type :" $tecreset ${OS}
 	echo -e '\E[32m'"OS Name :" $tecreset $OSSTR
 	echo -e '\E[32m'"OS Version" $tecreset ${REV}
 
