@@ -66,9 +66,9 @@ if [[ $# -eq 0 ]]; then
 	#
 	# Check OS Release Version and Name
 	#
-	OS=`uname -s`
-	REV=`uname -r`
-	MACH=`uname -m`
+	OS=$(uname -s)   # Kernel Name, for display purpose we need OS Name
+	REV=$(uname -r)
+	MACH=$(uname -m)
 
 	GetVersionFromFile()
 	{
