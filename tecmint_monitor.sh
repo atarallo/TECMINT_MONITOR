@@ -48,7 +48,7 @@ fi
 # Show version info
 #
 if [[ ! -z $vopt ]]; then
-	echo -e "tecmint_monitor version 0.1.1\nDesigned by Tecmint.com\nReleased Under Apache 2.0 License"
+	echo -e "tecmint_monitor version 0.1.2\nDesigned by Tecmint.com\nReleased Under Apache 2.0 License"
 fi
 
 #
@@ -63,29 +63,52 @@ if [[ $# -eq 0 ]]; then
 	# Check if connected to Internet or not
 	ping -c 1 google.com &> /dev/null && echo -e '\E[32m'"Internet: $tecreset Connected" || echo -e '\E[32m'"Internet: $tecreset Disconnected"
 
+	#
+	# Check OS Release Version and Name
+	#
+	OS=`uname -s`
+	REV=`uname -r`
+	MACH=`uname -m`
+
+	GetVersionFromFile()
+	{
+    		VERSION=`cat $1 | tr "\n" ' ' | sed s/.*VERSION.*=\ // `
+	}
+	# Check OS
+	if [ "${OS}" = "SunOS" ] ; then
+		OS=Solaris
+		ARCH=`uname -p`
+		OSSTR="${OS} ${REV}(${ARCH} `uname -v`)"
+	elif [ "${OS}" = "AIX" ] ; then
+		OSSTR="${OS} `oslevel` (`oslevel -r`)"
+	elif [ "${OS}" = "Linux" ] ; then
+		KERNEL=`uname -r`
+		if [ -f /etc/redhat-release ] ; then
+			DIST='RedHat'
+			PSUEDONAME=`cat /etc/redhat-release | sed s/.*\(// | sed s/\)//`
+			REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//`
+		elif [ -f /etc/SuSE-release ] ; then
+			DIST=`cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//`
+			REV=`cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //`
+		elif [ -f /etc/mandrake-release ] ; then
+			DIST='Mandrake'
+			PSUEDONAME=`cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//`
+			REV=`cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//`
+		elif [ -f /etc/debian_version ] ; then
+			DIST="Debian `cat /etc/debian_version`"
+			REV=""
+
+	fi
+    if ${OSSTR} [ -f /etc/UnitedLinux-release ] ; then
+        DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
+    fi
+
+    OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
+
+fi
 	# Check OS Type
 	os=$(uname -o)
 	echo -e '\E[32m'"Operating System Type :" $tecreset $os
-
-	release_file=$(ls /etc/*-release|grep -v 'lsb-release')
-	# A flag to handle distro specific ISSUES
-	distro="UNKNOWN-${os}"
-	# Check OS Release Version and Name
-	if [ -f /etc/os-release ]; then 
-		cat /etc/os-release | grep 'NAME\|VERSION' | grep -v 'VERSION_ID' | grep -v 'PRETTY_NAME' > /tmp/osrelease
-		echo -n -e '\E[32m'"OS Name :" $tecreset  && cat /tmp/osrelease | grep -v "VERSION" | grep -v CPE_NAME | cut -f2 -d\"
-		echo -n -e '\E[32m'"OS Version :" $tecreset && cat /tmp/osrelease | grep -v "NAME" | grep -v CT_VERSION | cut -f2 -d\"
-	else
-		if [ -f /etc/SuSE-release ]; then
-			OSNAME=$(cat /etc/SuSE-release| head -1)
-			VERSION=$(cat /etc/SuSE-release | grep VERSION | cut -f2 -d'=')
-			echo -n -e '\E[32m'"OS Name :" $tecreset && echo ${OSNAME}
-			echo -n -e '\E[32m'"OS Version :" $tecreset && echo ${VERSION}
-		else 
-			echo -n -e '\E[32m'"OS Name :"  $tecreset " **** NOT YET AVAILIABLE, Work in Progress ****\n"
-			echo -n -e '\E[32m'"OS Version :" $tecreset " **** NOT YET AVAILIABLE, Work in Progress ****\n"
-		fi
-	fi
 
 	# Check Architecture
 	architecture=$(uname -m)
@@ -148,3 +171,55 @@ if [[ $# -eq 0 ]]; then
 
 fi
 shift $(($OPTIND -1))
+
+
+*************
+
+if [[ $# -eq 0 ]]
+then
+{
+
+
+
+# Check OS Release Version and Name
+###################################
+OS=`uname -s`
+REV=`uname -r`
+MACH=`uname -m`
+
+GetVersionFromFile()
+{
+    VERSION=`cat $1 | tr "\n" ' ' | sed s/.*VERSION.*=\ // `
+}
+
+if [ "${OS}" = "SunOS" ] ; then
+    OS=Solaris
+    ARCH=`uname -p`
+    OSSTR="${OS} ${REV}(${ARCH} `uname -v`)"
+elif [ "${OS}" = "AIX" ] ; then
+    OSSTR="${OS} `oslevel` (`oslevel -r`)"
+elif [ "${OS}" = "Linux" ] ; then
+    KERNEL=`uname -r`
+    if [ -f /etc/redhat-release ] ; then
+        DIST='RedHat'
+        PSUEDONAME=`cat /etc/redhat-release | sed s/.*\(// | sed s/\)//`
+        REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//`
+    elif [ -f /etc/SuSE-release ] ; then
+        DIST=`cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//`
+        REV=`cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //`
+    elif [ -f /etc/mandrake-release ] ; then
+        DIST='Mandrake'
+        PSUEDONAME=`cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//`
+        REV=`cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//`
+    elif [ -f /etc/debian_version ] ; then
+        DIST="Debian `cat /etc/debian_version`"
+        REV=""
+
+    fi
+    if ${OSSTR} [ -f /etc/UnitedLinux-release ] ; then
+        DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
+    fi
+
+    OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
+
+fi
