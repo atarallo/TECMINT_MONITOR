@@ -1,0 +1,10 @@
+Package: monitor
+Version: 0.1-1
+Architecture: amd64
+Maintainer: ALJI Mohamed <mr.m.alji@gmail.com>
+Installed-Size: 9
+Section: unknown
+Priority: optional
+Homepage: <insert the upstream URL, if relevant>
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
