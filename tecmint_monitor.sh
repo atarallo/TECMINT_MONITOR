@@ -9,9 +9,6 @@
 #! /bin/bash
 # unset any variable which system may be using
 
-# clear the screen
-clear
-
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
 
 while getopts iv name
