@@ -8,7 +8,6 @@
 #                                                                                             #
 ###############################################################################################
 
-clear
 # unset any variable which system may be using
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
 
