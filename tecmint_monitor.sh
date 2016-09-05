@@ -9,7 +9,6 @@
 ###############################################################################################
 
 clear
-
 # unset any variable which system may be using
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
 
@@ -73,7 +72,7 @@ if [[ $# -eq 0 ]]; then
 
 	GetVersionFromFile()
 	{
-    		VERSION=`cat $1 | tr "\n" ' ' | sed s/.*VERSION.*=\ // `
+    		VERSION=$(cat $1 | tr "\n" ' ' | sed s/.*VERSION.*=\ // )
 	}
 	# Check OS
 	if [ "${OS}" = "SunOS" ] ; then
@@ -81,22 +80,22 @@ if [[ $# -eq 0 ]]; then
 		ARCH=`uname -p`
 		OSSTR="${OS} ${REV}(${ARCH} `uname -v`)"
 	elif [ "${OS}" = "AIX" ] ; then
-		OSSTR="${OS} `oslevel` (`oslevel -r`)"
+		OSSTR="${OS} $(oslevel) ($(oslevel -r))"
 	elif [ "${OS}" = "Linux" ] ; then
 		KERNEL=`uname -r`
 		if [ -f /etc/redhat-release ] ; then
 			DIST='RedHat'
-			PSUEDONAME=`cat /etc/redhat-release | sed s/.*\(// | sed s/\)//`
-			REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//`
+			PSUEDONAME=$(cat /etc/redhat-release | sed s/.*\(// | sed s/\)//)
+			REV=$(cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//)
 		elif [ -f /etc/SuSE-release ] ; then
-			DIST=`cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//`
-			REV=`cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //`
+			DIST=$(cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//)
+			REV=$(cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //)
 		elif [ -f /etc/mandrake-release ] ; then
 			DIST='Mandrake'
-			PSUEDONAME=`cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//`
-			REV=`cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//`
+			PSUEDONAME=$(cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//)
+			REV=$(cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*/)
 		elif [ -f /etc/debian_version ] ; then
-			DIST="Debian `cat /etc/debian_version`"
+			DIST="Debian $(cat /etc/debian_version)"
 			REV=""
 
 	fi
@@ -111,7 +110,7 @@ if [[ $# -eq 0 ]]; then
 	# Check OS Type
 	echo -e '\E[32m'"Operating System Type :" $tecreset ${OS}
 	echo -e '\E[32m'"OS Name :" $tecreset $OSSTR
-	echo -e '\E[32m'"OS Version" $tecreset ${REV}
+	echo -e '\E[32m'"OS Version:" $tecreset ${REV}
 
 	# Check Architecture
 	architecture=$(uname -m)
