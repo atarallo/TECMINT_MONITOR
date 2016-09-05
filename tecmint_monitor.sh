@@ -17,6 +17,14 @@ unset tecreset os architecture kernelrelease internalip externalip nameserver lo
 type -P curl > /dev/null || ( echo "CURL not availiable or not installed, fix prior running"; exit 1 )
 
 #
+# MacOs not yet supported. 
+#
+if [[ "$(uname -s)" == "darwin" ]]; then
+  echo "Mac OS X is not supported at this time"
+  exit 1
+fi
+
+#
 # Parse Command Line arguments
 #
 while getopts iv name
