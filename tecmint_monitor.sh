@@ -75,8 +75,8 @@ if [[ $# -eq 0 ]]; then
 	}
 	# Check OS
 	if [ "${OS}" = "SunOS" ] ; then
-		OS=Solaris
-		ARCH=`uname -p`
+		OS="Solaris"
+		ARCH=$(uname -p)
 		OSSTR="${OS} ${REV}(${ARCH} `uname -v`)"
 	elif [ "${OS}" = "AIX" ] ; then
 		OSSTR="${OS} $(oslevel) ($(oslevel -r))"
@@ -96,16 +96,14 @@ if [[ $# -eq 0 ]]; then
 		elif [ -f /etc/debian_version ] ; then
 			DIST="Debian $(cat /etc/debian_version)"
 			REV=""
-
+		elif [ -f /etc/UnitedLinux-release ] ; then
+			DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
+			REV=""
+		fi
+		OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
 	fi
-	if [ -f /etc/UnitedLinux-release ] ; then
-        	DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
-	fi
-
-	OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
 	OS=$(uname -o)
 
-	fi
 	# Check OS Type
 	echo -e '\E[32m'"Operating System Type :" $tecreset ${OS}
 	echo -e '\E[32m'"OS Name :" $tecreset $OSSTR
@@ -140,14 +138,14 @@ if [[ $# -eq 0 ]]; then
 
 	# Check RAM and SWAP Usages
 	free -m | grep -v + > /tmp/ramcache
-	echo -e '\E[32m'"Ram Usages :" $tecreset
+	echo -e '\E[32m'"Ram Usage :" $tecreset
 	cat /tmp/ramcache | grep -v "Swap"
-	echo -e '\E[32m'"Swap Usages :" $tecreset
+	echo -e '\E[32m'"Swap Usage :" $tecreset
 	cat /tmp/ramcache | grep -v "Mem" 
 
 	# Check Disk Usages
 	df -h| grep 'Filesystem\|/dev/sda*' > /tmp/diskusage
-	echo -e '\E[32m'"Disk Usages :" $tecreset 
+	echo -e '\E[32m'"Disk Usage :" $tecreset 
 	cat /tmp/diskusage
 
 	# Check Load Average, get data from /proc . This might not work outsude Linux.
