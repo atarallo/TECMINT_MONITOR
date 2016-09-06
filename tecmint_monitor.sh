@@ -49,8 +49,8 @@ tecreset=$(tput sgr0)
 ping -c 1 google.com &> /dev/null && echo -e '\E[32m'"Internet: $tecreset Connected" || echo -e '\E[32m'"Internet: $tecreset Disconnected"
 
 # Check OS Type
-os=$(uname -o)
-echo -e '\E[32m'"Operating System Type :" $tecreset $os
+OSTYPE=$(uname -o)
+echo -e '\E[32m'"Operating System Type :" $tecreset $OSTYPE
 
 # Check OS Release Version and Name
 ###################################
@@ -107,8 +107,8 @@ architecture=$(uname -m)
 echo -e '\E[32m'"Architecture :" $tecreset $architecture
 
 # Check Kernel Release
-kernelrelease=$(uname -r)
-echo -e '\E[32m'"Kernel Release :" $tecreset $kernelrelease
+kernel="$(uname --kernel-name) $(uname --kernel-release) $(uname --kernel-version)"
+echo -e '\E[32m'"Kernel Release :" $tecreset $kernel
 
 # Check hostname
 echo -e '\E[32m'"Hostname :" $tecreset $HOSTNAME
