@@ -6,7 +6,7 @@
                   # giving proper credit to Tecmint.com and Author                                                   #
                   #                                                                                                  #
                   ####################################################################################################
-#! /bin/bash
+#!/bin/bash
 # unset any variable which system may be using
 
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
@@ -41,11 +41,7 @@ if [[ $# -eq 0 ]]
 then
 {
 
-
-# Define Variable tecreset
-tecreset=$(tput sgr0)
-
-echo -e '\E[0;33m'"OS Informations : "
+echo -e '\E[0;33m'"OS Informations : "'\E[0m'
 
 # Check OS Type
 OSTYPE=$(uname -o)
@@ -96,56 +92,56 @@ elif [ "${OS}" = "Linux" ] ; then
 
 fi
 
-echo -e '\t\E[32m'"OS Version :" $tecreset $OSSTR 
+echo -e '\t\E[32m'"OS Version :" '\E[0m' $OSSTR 
 # Check Architecture
 architecture=$(uname -m)
-echo -e '\t\E[32m'"Architecture :" $tecreset $architecture
+echo -e '\t\E[32m'"Architecture :" '\E[0m' $architecture
 
 # Check Kernel Release
 kernel="$(uname --kernel-name) $(uname --kernel-release) $(uname --kernel-version)"
-echo -e '\t\E[32m'"Kernel :" $tecreset $kernel
+echo -e '\t\E[32m'"Kernel :" '\E[0m' $kernel
 
 # Check if connected to Internet or not
-ping -c 1 google.com &> /dev/null && echo -e '\E[32m'"Internet: $tecreset Connected" || echo -e '\E[32m'"Internet: $tecreset Disconnected"
+ping -c 1 google.com &> /dev/null && echo -e '\E[32m'"Internet:" '\E[0m' "Connected" || echo -e '\E[32m'"Internet:" '\E[0m' "Disconnected"
 
 # Check hostname
-echo -e '\E[32m'"Hostname :" $tecreset $HOSTNAME
+echo -e '\E[32m'"Hostname :" '\E[0m' $HOSTNAME
 
 # Check Internal IP
 internalip=$(hostname -I)
-echo -e '\E[32m'"Internal IP :" $tecreset $internalip
+echo -e '\E[32m'"Internal IP :" '\E[0m' $internalip
 
 # Check External IP
 externalip=$(curl -s ipecho.net/plain;echo)
-echo -e '\E[32m'"External IP : $tecreset "$externalip
+echo -e '\E[32m'"External IP : '\E[0m' "$externalip
 
 # Check DNS
 nameservers=$(cat /etc/resolv.conf | sed '1 d' | awk '{print $2}')
-echo -e '\E[32m'"Name Servers :" $tecreset $nameservers 
+echo -e '\E[32m'"Name Servers :" '\E[0m' $nameservers 
 
 # Check Logged In Users
 who>/tmp/who
-echo -e '\E[32m'"Logged In users :" $tecreset && cat /tmp/who 
+echo -e '\E[32m'"Logged In users :" '\E[0m' && cat /tmp/who 
 
 # Check RAM and SWAP Usages
 free -h | grep -v + > /tmp/ramcache
-echo -e '\E[32m'"Ram Usages :" $tecreset
+echo -e '\E[32m'"Ram Usages :" '\E[0m'
 cat /tmp/ramcache | grep -v "Swap"
-echo -e '\E[32m'"Swap Usages :" $tecreset
+echo -e '\E[32m'"Swap Usages :" '\E[0m'
 cat /tmp/ramcache | grep -v "Mem"
 
 # Check Disk Usages
 df -h| grep 'Filesystem\|/dev/sda*' > /tmp/diskusage
-echo -e '\E[32m'"Disk Usages :" $tecreset 
+echo -e '\E[32m'"Disk Usages :" '\E[0m' 
 cat /tmp/diskusage
 
 # Check Load Average
 loadaverage=$(top -n 1 -b | grep "load average:" | awk '{print $10 $11 $12}')
-echo -e '\E[32m'"Load Average :" $tecreset $loadaverage
+echo -e '\E[32m'"Load Average :" '\E[0m' $loadaverage
 
 # Check System Uptime
 tecuptime=$(uptime | awk '{print $3,$4}' | cut -f1 -d,)
-echo -e '\E[32m'"System Uptime Days/(HH:MM) :" $tecreset $tecuptime
+echo -e '\E[32m'"System Uptime Days/(HH:MM) :" '\E[0m' $tecuptime
 
 # Unset Variables
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
