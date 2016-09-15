@@ -9,17 +9,17 @@
 ###############################################################################################
 
 # unset any variable which system may be using
-unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
+unset os architecture kernelrelease internalip externalip nameserver loadaverage
 
 #
 # Check for CURL availiability, a dependency of this script
 #
-type -P curl > /dev/null || ( echo "CURL not availiable or not installed, fix prior running"; exit 1 )
+command -v curl > /dev/null || ( echo "CURL not availiable or not installed, fix prior running"; exit 1 )
 
 #
 # MacOs not yet supported. 
 #
-if [[ "$(uname -s)" == "darwin" ]]; then
+if [ "$(uname -s)" = "darwin" ]; then
   echo "Mac OS X is not supported at this time"
   exit 1
 fi
@@ -39,7 +39,7 @@ done
 #
 # Install
 #
-if [[ ! -z "$iopt" ]]; then 
+if [ ! -z "$iopt" ]; then 
 	fail_msg="Installation failed"
 	ok_msg="Congratulations! Script Installed, now run monitor Command"
 	wd=$(pwd)
@@ -54,21 +54,17 @@ fi
 #
 # Show version info
 #
-if [[ ! -z "$vopt" ]]; then
-	echo -e "tecmint_monitor version 0.1.2\nDesigned by Tecmint.com\nReleased Under Apache 2.0 License"
+if [ ! -z "$vopt" ]; then
+	printf "tecmint_monitor version 0.1.2\nDesigned by Tecmint.com\nReleased Under Apache 2.0 License\n"
 fi
 
 #
 # Monitoring
 #
-if [[ "$#" -eq 0 ]]; then
-
-
-	# Define Variable tecreset
-	tecreset=$(tput sgr0)
+if [ "$#" -eq 0 ]; then
 
 	# Check if connected to Internet or not
-	ping -c 1 google.com &> /dev/null && echo -e '\E[32m'"Internet: $tecreset Connected" || echo -e '\E[32m'"Internet: $tecreset Disconnected"
+	ping -c 1 google.com &> /dev/null && printf "\E[32mInternet: \E[0m Connected\n" || printf "\E[32mInternet: \E[0m Disconnected\n"
 
 	#
 	# Check OS Release Version and Name
@@ -113,63 +109,63 @@ if [[ "$#" -eq 0 ]]; then
 	OS=$(uname -o)
 
 	# Check OS Type
-	echo -e '\E[32m'"Operating System Type :" "$tecreset" "${OS}"
-	echo -e '\E[32m'"OS Name :" "$tecreset" "$OSSTR"
-	echo -e '\E[32m'"OS Version" "$tecreset" "${REV}"
+	printf "\E[32mOperating System Type : \E[0m ${OS}\n"
+	printf "\E[32mOS Name : \E[0m $OSSTR\n"
+	printf "\E[32mOS Version : \E[0m ${REV}\n"
 
 	# Check Architecture
 	architecture=$(uname -m)
-	echo -e '\E[32m'"Architecture :" "$tecreset" "$architecture"
+	printf "\E[32mArchitecture : \E[0m $architecture\n"
 
 	# Check Kernel Release
 	kernelrelease=$(uname -r)
-	echo -e '\E[32m'"Kernel Release :" "$tecreset" "$kernelrelease"
+	printf "\E[32mKernel Release : \E[0m $kernelrelease\n"
 
 	# Check hostname
-	echo -e '\E[32m'"Hostname :" "$tecreset" "$HOSTNAME"
+	printf "\E[32mHostname : \E[0m $HOSTNAME\n"
 
 	# Check Internal IP
 	internalip=$(hostname -i)
-	echo -e '\E[32m'"Internal IP :" "$tecreset" "$internalip"
+	printf "\E[32mInternal IP : \E[0m $internalip\n"
 
 	# Check External IP
 	externalip=$(curl -s ipecho.net/plain;echo)
-	echo -e '\E[32m'"External IP : $tecreset ""$externalip"
+	printf "\E[32mExternal IP : \E[0m $externalip\n"
 
 	# Check DNS
 	nameservers=$(cat /etc/resolv.conf |grep -v '#'| sed '1 d' | awk '{print $2}')
-	echo -e '\E[32m'"Name Servers :" "$tecreset" "$nameservers"
+	printf "\E[32mName Servers : \E[0m $nameservers\n"
 
 	# Check Logged In Users
 	who>/tmp/who
-	echo -e '\E[32m'"Logged In users :" "$tecreset" && cat /tmp/who 
+	printf "\E[32mLogged In users : \E[0m\n" && cat /tmp/who 
 
 	# Check RAM and SWAP Usages
 	free -m | grep -v + > /tmp/ramcache
-	echo -e '\E[32m'"Ram Usages :" "$tecreset"
+	printf "\E[32mRam Usages :\E[0m\n"
 	cat /tmp/ramcache | grep -v "Swap"
-	echo -e '\E[32m'"Swap Usages :" "$tecreset"
+	printf "\E[32mSwap Usages : \E[0m\n"
 	cat /tmp/ramcache | grep -v "Mem" 
 
 	# Check Disk Usages
 	df -h| grep 'Filesystem\|/dev/sda*' > /tmp/diskusage
-	echo -e '\E[32m'"Disk Usages :" "$tecreset"
+	printf "\E[32mDisk Usages :\E[0m\n"
 	cat /tmp/diskusage
 
 	# Check Load Average, get data from /proc . This might not work outsude Linux.
 	loadaverage=$(cat /proc/loadavg |  awk '{printf("%s %s %s",$1,$2,$3)}')
-	echo -e '\E[32m'"Load Average :" "$tecreset" "$loadaverage"
+	printf "\E[32mLoad Average : \E[0m $loadaverage\n"
 
 	# Check System Uptime
 	tecuptime=$(uptime | awk '{print $3,$4}' | cut -f1 -d,)
-	echo -e '\E[32m'"System Uptime Days/(HH:MM) :" "$tecreset" "$tecuptime"
+	printf "\E[32mSystem Uptime Days/(HH:MM) : \E[0m $tecuptime\n"
 
 	# Unset Variables
 	unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
 
 	# Remove Temporary Files
 	temp_files="/tmp/osrelease /tmp/who /tmp/ramcache /tmp/diskusage"
-	for i in "${temp_files}"; do 
+	for i in ${temp_files}; do 
 		# check if file exists prior removing.
 		if [ -f "${i}" ]; then
 			rm "${i}"
