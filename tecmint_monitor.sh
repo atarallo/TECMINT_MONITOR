@@ -8,8 +8,6 @@
 #                                                                                             #
 ###############################################################################################
 
-clear
-
 # unset any variable which system may be using
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
 
@@ -17,6 +15,14 @@ unset tecreset os architecture kernelrelease internalip externalip nameserver lo
 # Check for CURL availiability, a dependency of this script
 #
 type -P curl > /dev/null || ( echo "CURL not availiable or not installed, fix prior running"; exit 1 )
+
+#
+# MacOs not yet supported. 
+#
+if [[ "$(uname -s)" == "darwin" ]]; then
+  echo "Mac OS X is not supported at this time"
+  exit 1
+fi
 
 #
 # Parse Command Line arguments
@@ -98,16 +104,14 @@ if [[ "$#" -eq 0 ]]; then
 		elif [ -f /etc/debian_version ] ; then
 			DIST="Debian $(cat /etc/debian_version)"
 			REV=""
-
+		elif [ -f /etc/UnitedLinux-release ] ; then
+			DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
+			REV=""
+		fi
+		OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
 	fi
-	if [ -f /etc/UnitedLinux-release ] ; then
-        	DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
-	fi
-
-	OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
 	OS=$(uname -o)
 
-	fi
 	# Check OS Type
 	echo -e '\E[32m'"Operating System Type :" "$tecreset" "${OS}"
 	echo -e '\E[32m'"OS Name :" "$tecreset" "$OSSTR"
