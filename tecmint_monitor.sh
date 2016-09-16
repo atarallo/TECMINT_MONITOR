@@ -9,7 +9,7 @@
 ###############################################################################################
 
 # unset any variable which system may be using
-unset os architecture kernelrelease internalip externalip nameserver loadaverage
+unset os architecture kernelrelease internalip externalip nameserver loadaverage green colorReset
 
 #
 # Check for CURL availiability, a dependency of this script
@@ -44,8 +44,8 @@ if [ ! -z "$iopt" ]; then
 	ok_msg="Congratulations! Script Installed, now run monitor Command"
 	wd=$(pwd)
 	basename "$(test -L "$0" && readlink "$0" || echo "$0")" > /tmp/scriptname
-	scriptname=$(echo -e -n "$wd"/ && cat /tmp/scriptname)
-	su -c "cp $scriptname /usr/bin/monitor" root && echo "${ok_message}" || echo "${fail_msg}"
+	scriptname=$(printf "%s" "$wd"/ && cat /tmp/scriptname)
+	su -c "cp $scriptname /usr/bin/monitor" root && echo "${ok_msg}" || echo "${fail_msg}"
 	# cleanup after install
 	rm -f /tmp/scriptname
 fi
@@ -61,10 +61,13 @@ fi
 #
 # Monitoring
 #
+green="\E[32m"
+colorReset="\E[0m"
 if [ "$#" -eq 0 ]; then
 
 	# Check if connected to Internet or not
-	ping -c 1 google.com &> /dev/null && printf "\E[32mInternet: \E[0m Connected\n" || printf "\E[32mInternet: \E[0m Disconnected\n"
+	ping -c 1 google.com &> /dev/null && printf "%b Internet: %b Connected\n" "$green" "$colorReset" || printf "%b Internet: %b Disconnected\n" "$green" "$colorReset"
+
 
 	#
 	# Check OS Release Version and Name
@@ -108,57 +111,58 @@ if [ "$#" -eq 0 ]; then
 	fi
 	OS=$(uname -o)
 
+
 	# Check OS Type
-	printf "\E[32mOperating System Type : \E[0m ${OS}\n"
-	printf "\E[32mOS Name : \E[0m $OSSTR\n"
-	printf "\E[32mOS Version : \E[0m ${REV}\n"
+	printf "%b Operating System Type : %b ${OS}\n" "$green" "$colorReset"
+	printf "%b OS Name : %b $OSSTR\n" "$green" "$colorReset"
+	printf "%b OS Version : %b ${REV}\n" "$green" "$colorReset"
 
 	# Check Architecture
 	architecture=$(uname -m)
-	printf "\E[32mArchitecture : \E[0m $architecture\n"
+	printf "%b Architecture : %b $architecture\n" "$green" "$colorReset"
 
 	# Check Kernel Release
 	kernelrelease=$(uname -r)
-	printf "\E[32mKernel Release : \E[0m $kernelrelease\n"
+	printf "%b Kernel Release : %b $kernelrelease\n" "$green" "$colorReset"
 
 	# Check hostname
-	printf "\E[32mHostname : \E[0m $HOSTNAME\n"
+	printf "%b Hostname : %b %s\n" "$green" "$colorReset" "$HOSTNAME"
 
 	# Check Internal IP
 	internalip=$(hostname -i)
-	printf "\E[32mInternal IP : \E[0m $internalip\n"
+	printf "%b Internal IP : %b %s\n" "$green" "$colorReset" "$internalip"
 
 	# Check External IP
 	externalip=$(curl -s ipecho.net/plain;echo)
-	printf "\E[32mExternal IP : \E[0m $externalip\n"
+	printf "%b External IP : %b %s\n" "$green" "$colorReset" "$externalip"
 
 	# Check DNS
 	nameservers=$(cat /etc/resolv.conf |grep -v '#'| sed '1 d' | awk '{print $2}')
-	printf "\E[32mName Servers : \E[0m $nameservers\n"
+	printf "%bName Servers : %b %s\n" "$green" "$colorReset" "$nameservers"
 
 	# Check Logged In Users
 	who>/tmp/who
-	printf "\E[32mLogged In users : \E[0m\n" && cat /tmp/who 
+	printf "%b Logged In users : %b\n" "$green" "$colorReset" && cat /tmp/who  
 
 	# Check RAM and SWAP Usages
 	free -m | grep -v + > /tmp/ramcache
-	printf "\E[32mRam Usages :\E[0m\n"
+	printf "%b Ram Usages :%b\n" "$green" "$colorReset"
 	cat /tmp/ramcache | grep -v "Swap"
-	printf "\E[32mSwap Usages : \E[0m\n"
+	printf "%b Swap Usages : %b\n" "$green" "$colorReset"
 	cat /tmp/ramcache | grep -v "Mem" 
 
 	# Check Disk Usages
 	df -h| grep 'Filesystem\|/dev/sda*' > /tmp/diskusage
-	printf "\E[32mDisk Usages :\E[0m\n"
+	printf "%b Disk Usages :%b\n" "$green" "$colorReset"
 	cat /tmp/diskusage
 
 	# Check Load Average, get data from /proc . This might not work outsude Linux.
-	loadaverage=$(cat /proc/loadavg |  awk '{printf("%s %s %s",$1,$2,$3)}')
-	printf "\E[32mLoad Average : \E[0m $loadaverage\n"
+	loadaverage=$(cat /proc/loadavg |  awk '{printf("%b %b %b",$1,$2,$3)}')
+	printf "%b Load Average : %b $loadaverage\n" "$green" "$colorReset"
 
 	# Check System Uptime
 	tecuptime=$(uptime | awk '{print $3,$4}' | cut -f1 -d,)
-	printf "\E[32mSystem Uptime Days/(HH:MM) : \E[0m $tecuptime\n"
+	printf "%b System Uptime Days/(HH:MM) : %b $tecuptime\n" "$green" "$colorReset"
 
 	# Unset Variables
 	unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
