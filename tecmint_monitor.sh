@@ -95,7 +95,15 @@ if [ "$#" -eq 0 ]; then
 			REV=$(cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//)
 		elif [ -f /etc/SuSE-release ] ; then
 			DIST=$(cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//)
-			REV=$(cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //)
+			#
+			# Detect between OpenSuSE and SLES, 
+			#
+			echo ${DIST}|grep SERVER > /dev/null
+			if [ ${?} = "1" ]; then 
+				REV="Release "$(cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //)
+			else
+				REV=""
+			fi
 		elif [ -f /etc/mandrake-release ] ; then
 			DIST='Mandrake'
 			PSUEDONAME=$(cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//)
@@ -138,7 +146,7 @@ if [ "$#" -eq 0 ]; then
 
 	# Check DNS
 	nameservers=$(cat /etc/resolv.conf |grep -v '#'| sed '1 d' | awk '{print $2}')
-	printf "%bName Servers : %b %s\n" "$green" "$colorReset" "$nameservers"
+	printf "%b Name Servers : %b %s\n" "$green" "$colorReset" "$nameservers"
 
 	# Check Logged In Users
 	who>/tmp/who
