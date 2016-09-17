@@ -145,7 +145,7 @@ if [ "$#" -eq 0 ]; then
 	printf "%b External IP : %b %s\n" "$green" "$colorReset" "$externalip"
 
 	# Check DNS
-	nameservers=$(cat /etc/resolv.conf |grep -v '#'| sed '1 d' | awk '{print $2}')
+	nameservers=$(cat /etc/resolv.conf |grep -v '#'| sed '1 d' | awk '{print $2}'|tr "\n" ' ')
 	printf "%b Name Servers : %b %s\n" "$green" "$colorReset" "$nameservers"
 
 	# Check Logged In Users
