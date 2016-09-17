@@ -9,7 +9,7 @@
 ###############################################################################################
 
 # unset any variable which system may be using
-unset os architecture kernelrelease internalip externalip nameserver loadaverage green colorReset
+unset os architecture kernelrelease internalip externalip nameserver loadaverage green red colorReset
 
 #
 # Check for CURL availiability, a dependency of this script
@@ -67,7 +67,12 @@ colorReset="\E[0m"
 if [ "$#" -eq 0 ]; then
 
 	# Check if connected to Internet or not
-	ping -c 1 google.com &> /dev/null && printf "%b Internet: %b Connected\n" "$green" "$colorReset" || printf "%b Internet: %b Disconnected%b\n" "$green" "$red" "$colorReset"
+	ping -c 1 google.com >/dev/null 2>&1
+	if [ "$?" -eq 0 ]; then
+		printf "%b Internet: %b Connected\n" "$green" "$colorReset"
+	else
+		printf "%b Internet: %b Disconnected%b\n" "$green" "$red" "$colorReset"
+	fi
 
 	#
 	# Check OS Release Version and Name
@@ -112,7 +117,7 @@ if [ "$#" -eq 0 ]; then
 			DIST="Debian $(cat /etc/debian_version)"
 			REV=""
 		elif [ -f /etc/UnitedLinux-release ] ; then
-			DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
+			DIST="${DIST}[$(cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*// )]"
 			REV=""
 		fi
 		OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
@@ -173,7 +178,7 @@ if [ "$#" -eq 0 ]; then
 	printf "%b System Uptime Days/(HH:MM) : %b $tecuptime\n" "$green" "$colorReset"
 
 	# Unset Variables
-	unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
+	unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage green red colorReset
 
 	# Remove Temporary Files
 	temp_files="/tmp/osrelease /tmp/who /tmp/ramcache /tmp/diskusage"
