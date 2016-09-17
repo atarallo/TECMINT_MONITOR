@@ -62,13 +62,12 @@ fi
 # Monitoring
 #
 green="\E[32m"
-red="\E31m"
+red="\E[31m"
 colorReset="\E[0m"
 if [ "$#" -eq 0 ]; then
 
 	# Check if connected to Internet or not
-	ping -c 1 google.com &> /dev/null && printf "%b Internet: %b Connected\n" "$green" "$colorReset" || printf "%b Internet: %b Disconnected\n" "$red" "$colorReset"
-
+	ping -c 1 google.com &> /dev/null && printf "%b Internet: %b Connected\n" "$green" "$colorReset" || printf "%b Internet: %b Disconnected%b\n" "$green" "$red" "$colorReset"
 
 	#
 	# Check OS Release Version and Name
