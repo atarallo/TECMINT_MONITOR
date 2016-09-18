@@ -96,28 +96,28 @@ if [ "$#" -eq 0 ]; then
 		KERNEL=$(uname -r)
 		if [ -f /etc/redhat-release ] ; then
 			DIST='RedHat'
-			PSUEDONAME=$(cat /etc/redhat-release | sed s/.*\(// | sed s/\)//)
-			REV=$(cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//)
+			PSUEDONAME=$(sed s/.*\(// /etc/redhat-release | sed s/\)//)
+			REV=$(sed s/.*release\ // /etc/redhat-release | sed s/\ .*//)
 		elif [ -f /etc/SuSE-release ] ; then
-			DIST=$(cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//)
+			DIST=$(sed s/VERSION.*// /etc/SuSE-release | tr "\n" ' ' )
 			#
 			# Detect between OpenSuSE and SLES, 
 			#
 			echo "${DIST}"|grep SERVER > /dev/null
 			if [ "${?}" = "1" ]; then 
-				REV="Release "$(cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //)
+				REV="Release "$(sed s/.*=\ // /etc/SuSE-release | tr "\n" ' ' )
 			else
 				REV=""
 			fi
 		elif [ -f /etc/mandrake-release ] ; then
 			DIST='Mandrake'
-			PSUEDONAME=$(cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//)
-			REV=$(cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//)
+			PSUEDONAME=$(sed s/.*\(// /etc/mandrake-release  | sed s/\)//)
+			REV=$(sed s/.*release\ // /etc/mandrake-release | sed s/\ .*//)
 		elif [ -f /etc/debian_version ] ; then
 			DIST="Debian $(cat /etc/debian_version)"
 			REV=""
 		elif [ -f /etc/UnitedLinux-release ] ; then
-			DIST="${DIST}[$(cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*// )]"
+			DIST="${DIST}[$(sed s/VERSION.*// /etc/UnitedLinux-release | tr "\n" ' ' )]"
 			REV=""
 		fi
 		OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
@@ -150,7 +150,7 @@ if [ "$#" -eq 0 ]; then
 	printf "%b External IP : %b %s\n" "$green" "$colorReset" "$externalip"
 
 	# Check DNS
-	nameservers=$(cat /etc/resolv.conf |grep -v '#'| sed '1 d' | awk '{print $2}'|tr "\n" ' ')
+	nameservers=$(grep -v '#' /etc/resolv.conf  | sed '1 d' | awk '{print $2}'|tr "\n" ' ')
 	printf "%b Name Servers : %b %s\n" "$green" "$colorReset" "$nameservers"
 
 	# Check Logged In Users
@@ -160,9 +160,9 @@ if [ "$#" -eq 0 ]; then
 	# Check RAM and SWAP Usages
 	free -m | grep -v + > /tmp/ramcache
 	printf "%b Ram Usages :%b\n" "$green" "$colorReset"
-	cat /tmp/ramcache | grep -v "Swap"
+	grep -v "Swap" /tmp/ramcache
 	printf "%b Swap Usages : %b\n" "$green" "$colorReset"
-	cat /tmp/ramcache | grep -v "Mem" 
+	grep -v "Mem"  /tmp/ramcache
 
 	# Check Disk Usages
 	df -h| grep 'Filesystem\|/dev/sda*' > /tmp/diskusage
@@ -170,7 +170,7 @@ if [ "$#" -eq 0 ]; then
 	cat /tmp/diskusage
 
 	# Check Load Average, get data from /proc . This might not work outsude Linux.
-	loadaverage=$(cat /proc/loadavg |  awk '{printf("%b %b %b",$1,$2,$3)}')
+	loadaverage=$(awk '{printf("%b %b %b",$1,$2,$3)}' /proc/loadavg )
 	printf "%b Load Average : %b $loadaverage\n" "$green" "$colorReset"
 
 	# Check System Uptime
