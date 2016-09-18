@@ -81,10 +81,10 @@ if [ "$#" -eq 0 ]; then
 	REV=$(uname -r)
 	MACH=$(uname -m)
 
-	GetVersionFromFile()
-	{
-    		VERSION=$(cat "$1" | tr "\n" ' ' | sed s/.*VERSION.*=\ // )
-	}
+#	GetVersionFromFile()
+#	{
+#    		VERSION=$(cat "$1" | tr "\n" ' ' | sed s/.*VERSION.*=\ // )
+#	}
 	# Check OS
 	if [ "${OS}" = "SunOS" ] ; then
 		OS=Solaris
@@ -103,8 +103,8 @@ if [ "$#" -eq 0 ]; then
 			#
 			# Detect between OpenSuSE and SLES, 
 			#
-			echo ${DIST}|grep SERVER > /dev/null
-			if [ ${?} = "1" ]; then 
+			echo "${DIST}"|grep SERVER > /dev/null
+			if [ "${?}" = "1" ]; then 
 				REV="Release "$(cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //)
 			else
 				REV=""
@@ -133,13 +133,13 @@ if [ "$#" -eq 0 ]; then
 	# Check Architecture
 	architecture=$(uname -m)
 	printf "%b Architecture : %b $architecture\n" "$green" "$colorReset"
-
 	# Check Kernel Release
 	kernelrelease=$(uname -r)
 	printf "%b Kernel Release : %b $kernelrelease\n" "$green" "$colorReset"
 
 	# Check hostname
-	printf "%b Hostname : %b %s\n" "$green" "$colorReset" "$HOSTNAME"
+	hostnamev=$(hostname -f)
+	printf "%b Hostname : %b %s\n" "$green" "$colorReset" "$hostnamev"
 
 	# Check Internal IP
 	internalip=$(hostname -i)
