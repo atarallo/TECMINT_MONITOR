@@ -81,10 +81,6 @@ if [ "$#" -eq 0 ]; then
 	REV=$(uname -r)
 	MACH=$(uname -m)
 
-#	GetVersionFromFile()
-#	{
-#    		VERSION=$(cat "$1" | tr "\n" ' ' | sed s/.*VERSION.*=\ // )
-#	}
 	# Check OS
 	if [ "${OS}" = "SunOS" ] ; then
 		OS=Solaris
@@ -93,8 +89,13 @@ if [ "$#" -eq 0 ]; then
 	elif [ "${OS}" = "AIX" ] ; then
 		OSSTR="${OS} $(oslevel) ($(oslevel -r))"
 	elif [ "${OS}" = "Linux" ] ; then
-		KERNEL=$(uname -r)
-		if [ -f /etc/redhat-release ] ; then
+
+		command -v lsb_release > /dev/null 
+		if [ "$?" == "0" ]; then
+			DIST=$(lsb_release -i | sed 's/Distributor ID://' | tr -d '\t')
+			REV=$(lsb_release -r | sed 's/Release://' | tr -d '\t')
+			PSEUDONAME=$(lsb_release -c | sed 's/Codename://' | tr -d '\t')
+		elif [ -f /etc/redhat-release ] ; then
 			DIST='RedHat'
 			PSUEDONAME=$(sed s/.*\(// /etc/redhat-release | sed s/\)//)
 			REV=$(sed s/.*release\ // /etc/redhat-release | sed s/\ .*//)
@@ -120,7 +121,9 @@ if [ "$#" -eq 0 ]; then
 			DIST="${DIST}[$(sed s/VERSION.*// /etc/UnitedLinux-release | tr "\n" ' ' )]"
 			REV=""
 		fi
-		OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
+		KERNEL=$(uname -r)
+
+		OSSTR="${DIST} GNU/${OS} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
 	fi
 	OS=$(uname -o)
 
