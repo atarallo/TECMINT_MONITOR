@@ -9,7 +9,7 @@
 ###############################################################################################
 
 # unset any variable which system may be using
-unset os architecture kernelrelease internalip externalip nameserver loadaverage green red colorReset batUsage
+unset os architecture kernelrelease internalip externalip nameserver loadaverage green red colorReset
 
 #
 # Check for CURL availiability, a dependency of this script
@@ -177,12 +177,8 @@ if [ "$#" -eq 0 ]; then
 	tecuptime=$(uptime | awk '{print $3,$4}' | cut -f1 -d,)
 	printf "%b System Uptime Days/(HH:MM) : %b $tecuptime\n" "$green" "$colorReset"
 
-	# Check Battery Usage
-	batUsage=$(upower -i $(upower -e | grep "battery") | grep -E 'state|to\ full|percentage')
-	printf "%b Battery Usage :%b \n%b\n" "$green" "$colorReset" "$batUsage"
-
 	# Unset Variables
-	unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage green red colorReset batUsage
+	unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage green red colorReset
 
 	# Remove Temporary Files
 	temp_files="/tmp/osrelease /tmp/who /tmp/ramcache /tmp/diskusage"
