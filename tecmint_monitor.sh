@@ -84,13 +84,13 @@ if [ "$#" -eq 0 ]; then
 	elif [ "${OS}" = "Linux" ] ; then
 
 		command -v lsb_release > /dev/null 
-		if [ "$?" == "0" ]; then
+		if [ "$?" = "0" ]; then
 			DIST=$(lsb_release -i | sed 's/Distributor ID://' | tr -d '\t')
 			REV=$(lsb_release -r | sed 's/Release://' | tr -d '\t')
 			PSEUDONAME=$(lsb_release -c | sed 's/Codename://' | tr -d '\t')
 		elif [ -f /etc/redhat-release ] ; then
 			DIST='RedHat'
-			PSUEDONAME=$(sed s/.*\(// /etc/redhat-release | sed s/\)//)
+			PSEUDONAME=$(sed s/.*\(// /etc/redhat-release | sed s/\)//)
 			REV=$(sed s/.*release\ // /etc/redhat-release | sed s/\ .*//)
 		elif [ -f /etc/SuSE-release ] ; then
 			DIST=$(sed s/VERSION.*// /etc/SuSE-release | tr "\n" ' ' )
@@ -105,7 +105,7 @@ if [ "$#" -eq 0 ]; then
 			fi
 		elif [ -f /etc/mandrake-release ] ; then
 			DIST='Mandrake'
-			PSUEDONAME=$(sed s/.*\(// /etc/mandrake-release  | sed s/\)//)
+			PSEUDONAME=$(sed s/.*\(// /etc/mandrake-release  | sed s/\)//)
 			REV=$(sed s/.*release\ // /etc/mandrake-release | sed s/\ .*//)
 		elif [ -f /etc/debian_version ] ; then
 			DIST="Debian $(cat /etc/debian_version)"
@@ -116,7 +116,7 @@ if [ "$#" -eq 0 ]; then
 		fi
 		KERNEL=$(uname -r)
 
-		OSSTR="${DIST} GNU/${OS} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
+		OSSTR="${DIST} GNU/${OS} ${REV}(${PSEUDONAME} ${KERNEL} ${MACH})"
 	fi
 	OS=$(uname -o)
 
