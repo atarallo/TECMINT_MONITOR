@@ -9,7 +9,7 @@
 ###############################################################################################
 
 # unset any variable which system may be using
-unset os architecture kernelrelease internalip externalip nameserver loadaverage green red colorReset
+unset os architecture kernelrelease internalip externalip nameserver loadaverage green greenBold red colorReset
 
 #
 # Check for CURL availiability, a dependency of this script
@@ -62,17 +62,10 @@ fi
 # Monitoring
 #
 green="\E[32m"
+greenBold="\E[33;1m"
 red="\E[31m"
 colorReset="\E[0m"
 if [ "$#" -eq 0 ]; then
-
-	# Check if connected to Internet or not
-	ping -c 1 google.com >/dev/null 2>&1
-	if [ "$?" -eq 0 ]; then
-		printf "%b Internet: %b Connected\n" "$green" "$colorReset"
-	else
-		printf "%b Internet: %b Disconnected%b\n" "$green" "$red" "$colorReset"
-	fi
 
 	#
 	# Check OS Release Version and Name
@@ -91,13 +84,13 @@ if [ "$#" -eq 0 ]; then
 	elif [ "${OS}" = "Linux" ] ; then
 
 		command -v lsb_release > /dev/null 
-		if [ "$?" == "0" ]; then
+		if [ "$?" = "0" ]; then
 			DIST=$(lsb_release -i | sed 's/Distributor ID://' | tr -d '\t')
 			REV=$(lsb_release -r | sed 's/Release://' | tr -d '\t')
 			PSEUDONAME=$(lsb_release -c | sed 's/Codename://' | tr -d '\t')
 		elif [ -f /etc/redhat-release ] ; then
 			DIST='RedHat'
-			PSUEDONAME=$(sed s/.*\(// /etc/redhat-release | sed s/\)//)
+			PSEUDONAME=$(sed s/.*\(// /etc/redhat-release | sed s/\)//)
 			REV=$(sed s/.*release\ // /etc/redhat-release | sed s/\ .*//)
 		elif [ -f /etc/SuSE-release ] ; then
 			DIST=$(sed s/VERSION.*// /etc/SuSE-release | tr "\n" ' ' )
@@ -112,7 +105,7 @@ if [ "$#" -eq 0 ]; then
 			fi
 		elif [ -f /etc/mandrake-release ] ; then
 			DIST='Mandrake'
-			PSUEDONAME=$(sed s/.*\(// /etc/mandrake-release  | sed s/\)//)
+			PSEUDONAME=$(sed s/.*\(// /etc/mandrake-release  | sed s/\)//)
 			REV=$(sed s/.*release\ // /etc/mandrake-release | sed s/\ .*//)
 		elif [ -f /etc/debian_version ] ; then
 			DIST="Debian $(cat /etc/debian_version)"
@@ -123,11 +116,12 @@ if [ "$#" -eq 0 ]; then
 		fi
 		KERNEL=$(uname -r)
 
-		OSSTR="${DIST} GNU/${OS} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
+		OSSTR="${DIST} GNU/${OS} ${REV}(${PSEUDONAME} ${KERNEL} ${MACH})"
 	fi
 	OS=$(uname -o)
 
 
+	printf "%b OS Information : %b\n" "$greenBold" "$colorReset"
 	# Check OS Type
 	printf "%b Operating System Type : %b ${OS}\n" "$green" "$colorReset"
 	printf "%b OS Name : %b $OSSTR\n" "$green" "$colorReset"
@@ -139,6 +133,17 @@ if [ "$#" -eq 0 ]; then
 	# Check Kernel Release
 	kernelrelease=$(uname -r)
 	printf "%b Kernel Release : %b $kernelrelease\n" "$green" "$colorReset"
+
+
+	printf "%b Network Status : %b\n" "$greenBold" "$colorReset"
+
+        # Check if connected to Internet or not
+        ping -c 1 google.com >/dev/null 2>&1
+        if [ "$?" -eq 0 ]; then
+                printf "%b Internet: %b Connected\n" "$green" "$colorReset"
+        else
+                printf "%b Internet: %b Disconnected%b\n" "$green" "$red" "$colorReset"
+        fi
 
 	# Check hostname
 	hostnamev=$(hostname -f)
@@ -158,7 +163,10 @@ if [ "$#" -eq 0 ]; then
 
 	# Check Logged In Users
 	who>/tmp/who
-	printf "%b Logged In users : %b\n" "$green" "$colorReset" && cat /tmp/who  
+	printf "%b Logged In users : %b\n" "$greenBold" "$colorReset" && cat /tmp/who  
+
+
+	printf "%b RAM and SWAP Usage : %b\n" "$greenBold" "$colorReset"
 
 	# Check RAM and SWAP Usages
 	free -m | grep -v + > /tmp/ramcache
@@ -168,12 +176,14 @@ if [ "$#" -eq 0 ]; then
 	grep -v "Mem"  /tmp/ramcache
 
 	# Check Disk Usages
+	printf "%b Disk Usage : %b\n" "$greenBold" "$colorReset"
 	df -h| grep 'Filesystem\|/dev/sda*' > /tmp/diskusage
-	printf "%b Disk Usages :%b\n" "$green" "$colorReset"
 	cat /tmp/diskusage
 
-	# Check Load Average, get data from /proc . This might not work outsude Linux.
-	loadaverage=$(awk '{printf("%b %b %b",$1,$2,$3)}' /proc/loadavg )
+
+	printf "%b Load Average and Uptime : %b\n" "$greenBold" "$colorReset"
+	# Check Load Average using uptime
+	loadaverage=$(uptime | sed 's/.*load average: //' )
 	printf "%b Load Average : %b $loadaverage\n" "$green" "$colorReset"
 
 	# Check System Uptime
@@ -181,7 +191,7 @@ if [ "$#" -eq 0 ]; then
 	printf "%b System Uptime Days/(HH:MM) : %b $tecuptime\n" "$green" "$colorReset"
 
 	# Unset Variables
-	unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage green red colorReset
+	unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage green greenBold red colorReset
 
 	# Remove Temporary Files
 	temp_files="/tmp/osrelease /tmp/who /tmp/ramcache /tmp/diskusage"
