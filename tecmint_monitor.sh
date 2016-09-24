@@ -176,17 +176,19 @@ if [ "$#" -eq 0 ]; then
 	grep -v "Mem"  /tmp/ramcache
 
 	# Check Disk Usages
-	printf "%b Disk Usages : %b\n" "$greenBold" "$colorReset"
+	printf "%b Disk Usage : %b\n" "$greenBold" "$colorReset"
 	df -h| grep 'Filesystem\|/dev/sda*' > /tmp/diskusage
 	cat /tmp/diskusage
 
-	# Check Load Average, get data from /proc . This might not work outsude Linux.
-	loadaverage=$(awk '{printf("%b %b %b",$1,$2,$3)}' /proc/loadavg )
-	printf "%b Load Average : %b $loadaverage\n" "$greenBold" "$colorReset"
+
+	printf "%b Load Average and Uptime : %b\n" "$greenBold" "$colorReset"
+	# Check Load Average using uptime
+	loadaverage=$(uptime | sed 's/.*load average: //' )
+	printf "%b Load Average : %b $loadaverage\n" "$green" "$colorReset"
 
 	# Check System Uptime
 	tecuptime=$(uptime | awk '{print $3,$4}' | cut -f1 -d,)
-	printf "%b System Uptime Days/(HH:MM) : %b $tecuptime\n" "$greenBold" "$colorReset"
+	printf "%b System Uptime Days/(HH:MM) : %b $tecuptime\n" "$green" "$colorReset"
 
 	# Unset Variables
 	unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage green greenBold red colorReset
