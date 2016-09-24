@@ -9,7 +9,7 @@
 ###############################################################################################
 
 # unset any variable which system may be using
-unset os architecture kernelrelease internalip externalip nameserver loadaverage green red colorReset
+unset os architecture kernelrelease internalip externalip nameserver loadaverage green greenBold red colorReset
 
 #
 # Check for CURL availiability, a dependency of this script
@@ -62,17 +62,10 @@ fi
 # Monitoring
 #
 green="\E[32m"
+greenBold="\E[33;1m"
 red="\E[31m"
 colorReset="\E[0m"
 if [ "$#" -eq 0 ]; then
-
-	# Check if connected to Internet or not
-	ping -c 1 google.com >/dev/null 2>&1
-	if [ "$?" -eq 0 ]; then
-		printf "%b Internet: %b Connected\n" "$green" "$colorReset"
-	else
-		printf "%b Internet: %b Disconnected%b\n" "$green" "$red" "$colorReset"
-	fi
 
 	#
 	# Check OS Release Version and Name
@@ -128,6 +121,7 @@ if [ "$#" -eq 0 ]; then
 	OS=$(uname -o)
 
 
+	printf "%b OS Information : %b\n" "$greenBold" "$colorReset"
 	# Check OS Type
 	printf "%b Operating System Type : %b ${OS}\n" "$green" "$colorReset"
 	printf "%b OS Name : %b $OSSTR\n" "$green" "$colorReset"
@@ -139,6 +133,17 @@ if [ "$#" -eq 0 ]; then
 	# Check Kernel Release
 	kernelrelease=$(uname -r)
 	printf "%b Kernel Release : %b $kernelrelease\n" "$green" "$colorReset"
+
+
+	printf "%b Network Status : %b\n" "$greenBold" "$colorReset"
+
+        # Check if connected to Internet or not
+        ping -c 1 google.com >/dev/null 2>&1
+        if [ "$?" -eq 0 ]; then
+                printf "%b Internet: %b Connected\n" "$green" "$colorReset"
+        else
+                printf "%b Internet: %b Disconnected%b\n" "$green" "$red" "$colorReset"
+        fi
 
 	# Check hostname
 	hostnamev=$(hostname -f)
@@ -158,7 +163,10 @@ if [ "$#" -eq 0 ]; then
 
 	# Check Logged In Users
 	who>/tmp/who
-	printf "%b Logged In users : %b\n" "$green" "$colorReset" && cat /tmp/who  
+	printf "%b Logged In users : %b\n" "$greenBold" "$colorReset" && cat /tmp/who  
+
+
+	printf "%b RAM and SWAP Usage : %b\n" "$greenBold" "$colorReset"
 
 	# Check RAM and SWAP Usages
 	free -m | grep -v + > /tmp/ramcache
@@ -168,20 +176,20 @@ if [ "$#" -eq 0 ]; then
 	grep -v "Mem"  /tmp/ramcache
 
 	# Check Disk Usages
+	printf "%b Disk Usages : %b\n" "$greenBold" "$colorReset"
 	df -h| grep 'Filesystem\|/dev/sda*' > /tmp/diskusage
-	printf "%b Disk Usages :%b\n" "$green" "$colorReset"
 	cat /tmp/diskusage
 
 	# Check Load Average, get data from /proc . This might not work outsude Linux.
 	loadaverage=$(awk '{printf("%b %b %b",$1,$2,$3)}' /proc/loadavg )
-	printf "%b Load Average : %b $loadaverage\n" "$green" "$colorReset"
+	printf "%b Load Average : %b $loadaverage\n" "$greenBold" "$colorReset"
 
 	# Check System Uptime
 	tecuptime=$(uptime | awk '{print $3,$4}' | cut -f1 -d,)
-	printf "%b System Uptime Days/(HH:MM) : %b $tecuptime\n" "$green" "$colorReset"
+	printf "%b System Uptime Days/(HH:MM) : %b $tecuptime\n" "$greenBold" "$colorReset"
 
 	# Unset Variables
-	unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage green red colorReset
+	unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage green greenBold red colorReset
 
 	# Remove Temporary Files
 	temp_files="/tmp/osrelease /tmp/who /tmp/ramcache /tmp/diskusage"
