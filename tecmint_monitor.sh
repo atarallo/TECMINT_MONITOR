@@ -147,7 +147,8 @@ monitor() {
     cat /tmp/ramcache | grep -v "Mem"
 
     # Check Disk Usages
-    df 2>/dev/null -h| grep 'Filesystem\|/dev/sda*' > /tmp/diskusage
+    hddisk=$(lsblk | grep disk | awk '{print $1}')
+    df -h| grep "Filesystem\|/dev/${hddisk}*" > /tmp/diskusage
     echo -e '\E[32m'"Disk Usages :" $tecreset
     cat /tmp/diskusage
 
