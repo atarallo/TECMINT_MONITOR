@@ -118,7 +118,7 @@ internalip=$(hostname -I)
 echo -e '\E[32m'"Internal IP :" $tecreset $internalip
 
 # Check External IP
-externalip=$(curl -s ipecho.net/plain;echo)
+externalip=$(dig +short myip.opendns.com @resolver1.opendns.com)
 echo -e '\E[32m'"External IP : $tecreset "$externalip
 
 # Check DNS
