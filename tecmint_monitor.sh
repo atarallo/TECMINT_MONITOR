@@ -7,8 +7,11 @@
                   #                                                                                                  #
                   ####################################################################################################
 #! /bin/bash
-# unset any variable which system may be using
 
+# clear the screen
+clear
+
+# unset any variable which system may be using
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
 
 while getopts iv name
