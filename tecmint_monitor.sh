@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 ####################################################################################################
 #                                        Tecmint_monitor.sh                                        #
 # Written for Tecmint.com for the post www.tecmint.com/linux-server-health-monitoring-script/      #
@@ -6,7 +8,7 @@
 # giving proper credit to Tecmint.com and Author                                                   #
 #                                                                                                  #
 ####################################################################################################
-#! /bin/bash
+
 
 # clear the screen
 clear
