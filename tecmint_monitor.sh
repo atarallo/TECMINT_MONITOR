@@ -58,9 +58,6 @@ monitor() {
     # Define Variable tecreset
     tecreset=$(tput sgr0)
 
-    # Check if connected to Internet or not
-    ping -c 1 google.com &> /dev/null && echo -e '\E[32m'"Internet: $tecreset Connected" || echo -e '\E[32m'"Internet: $tecreset Disconnected"
-
     # Check OS Type
     os=$(uname -o)
     echo -e '\E[32m'"Operating System Type :" $tecreset $os
@@ -123,6 +120,9 @@ monitor() {
 
     # Check hostname
     echo -e '\E[32m'"Hostname :" $tecreset $HOSTNAME
+
+    # Check if connected to Internet or not
+    ping -c 1 google.com &> /dev/null && echo -e '\E[32m'"Internet: $tecreset Connected" || echo -e '\E[32m'"Internet: $tecreset Disconnected"
 
     # Check Internal IP
     internalip=$(hostname -I)
