@@ -16,7 +16,7 @@ the appropiate permissions to the script using ```chmod``` command and execute i
 $./tecmint_monitor.sh -i
 ```
 
-![Shell Script to Monitor Linux System Health](http://www.tecmint.com/wp-content/uploads/2015/05/Linux-Health-Monitoring.png "Shell Script to Monitor Linux System Health")
+![Shell Script to Monitor Linux System Health](img/Linux-Health-Monitoring.png "Shell Script to Monitor Linux System Health")
 
 You can check some basics informations about the script by executing :
 
