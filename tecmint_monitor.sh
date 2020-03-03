@@ -136,7 +136,7 @@ if [ $# -eq 0 ]; then
     cat /tmp/diskusage
 
     # Check Load Average
-    loadaverage=$(top -n 1 -b | grep "load average:" | awk '{print $(NF-2) $(NF-1) $NF}')
+    loadaverage=$(top -n 1 -b | grep "load average:" | awk '{print $(NF-2)" "$(NF-1)" "$NF}')
     echo -e '\E[32m'"Load Average :" $tecreset $loadaverage
 
     # Check System Uptime
