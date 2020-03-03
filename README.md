@@ -1,27 +1,30 @@
 # TECMINT_MONITOR
-A Shell Script to Monitor Network, Disk Usage, Uptime, Load Average and RAM
-usage in Linux. 
+A Shell Script to Monitor Network, Disk Usage, Uptime, Load Average and RAM usage in Linux.
 
 # USAGE
 
-To execute the script please read its content, using in preference nano editor, and then 
+To execute the script please read its content, using in preference nano editor, and then
 
 ```
-$ bash tecmin_monitor.sh 
+$ bash tecmin_monitor.sh
 ```
-or you can install it, by downloading the script to the computer you want to monitor. Then give the appropiate permissions to the script using ```chmod``` command  and execute it like this : 
+
+or you can install it, by downloading the script to the computer you want to monitor. Then give
+the appropiate permissions to the script using ```chmod``` command and execute it like this :
+
 ```
 $./tecmint_monitor.sh -i
 ```
 
 ![Shell Script to Monitor Linux System Health](http://www.tecmint.com/wp-content/uploads/2015/05/Linux-Health-Monitoring.png "Shell Script to Monitor Linux System Health")
 
-You can check some basics informations about the script by executing : 
+You can check some basics informations about the script by executing :
+
 ```
 $ bash tecmint_monitor -v
 ```
 
-# BUG AND REPORT 
+# BUG AND REPORT
 
 Please report to us on [tecmint website](http://www.tecmint.com/linux-server-health-monitoring-script/).
 
