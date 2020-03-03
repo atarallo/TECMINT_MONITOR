@@ -16,7 +16,7 @@ clear
 # unset any variable which system may be using
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
 
-SCRIPT_NAME="$BASH_SOURCE"
+SCRIPT_NAME="${BASH_SOURCE##*/}"
 help() {
     echo "Usage:"
     echo " $SCRIPT_NAME [-u] [-v] [-h]"
