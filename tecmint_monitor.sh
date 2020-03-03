@@ -26,7 +26,7 @@ help() {
 }
 
 show_version() {
-    version=0.1
+    version=0.2
     echo "tecmint_monitor $version"
     echo "Designed by Tecmint.com"
     echo "Released Under Apache 2.0 License"
