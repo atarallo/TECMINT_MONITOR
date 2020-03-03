@@ -75,14 +75,14 @@ monitor() {
         KERNEL=$(uname -r)
         if [ -f /etc/redhat-release ]; then
             DIST='RedHat'
-            PSUEDONAME=$(cat /etc/redhat-release | sed s/.*\(// | sed s/\)//)
+            PSEUDONAME=$(cat /etc/redhat-release | sed s/.*\(// | sed s/\)//)
             REV=$(cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//)
         elif [ -f /etc/SuSE-release ]; then
             DIST=$(cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//)
             REV=$(cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //)
         elif [ -f /etc/mandrake-release ]; then
             DIST='Mandrake'
-            PSUEDONAME=$(cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//)
+            PSEUDONAME=$(cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//)
             REV=$(cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//)
         elif [ -f /etc/os-release ]; then
             DIST=$(awk -F "PRETTY_NAME=" '{print $2}' /etc/os-release | tr -d '\n"')
@@ -94,7 +94,7 @@ monitor() {
             DIST="${DIST}[$(cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//)]"
         fi
 
-        OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
+        OSSTR="${OS} ${DIST} ${REV}(${PSEUDONAME} ${KERNEL} ${MACH})"
     fi
 
     ##################################
