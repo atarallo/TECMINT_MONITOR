@@ -25,10 +25,18 @@ help() {
     echo "  -v  show version"
 }
 
+show_version() {
+    version=0.1
+    echo "tecmint_monitor $version"
+    echo "Designed by Tecmint.com"
+    echo "Released Under Apache 2.0 License"
+}
+
 while getopts "ivuh?" name; do
     case "$name" in
         i) iopt=1;;
-        v) vopt=1;;
+        v) show_version
+           exit 0;;
         u) show_user=1;;
         h) help
            exit 0;;
@@ -43,11 +51,6 @@ if [ -n "$iopt" ]; then
     basename "$(test -L "$0" && readlink "$0" || echo "$0")" > /tmp/scriptname
     scriptname=$(echo -e -n $wd/ && cat /tmp/scriptname)
     su -c "cp $scriptname /usr/bin/monitor" root && echo "Congratulations! Script Installed, now run monitor Command" || echo "Installation failed"
-fi
-
-if [ -n "$vopt" ]; then
-    echo -e "tecmint_monitor version 0.1\nDesigned by Tecmint.com\nReleased Under Apache 2.0 License"
-    exit 0
 fi
 
 monitor() {
