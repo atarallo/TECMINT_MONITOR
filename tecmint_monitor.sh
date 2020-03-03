@@ -112,8 +112,12 @@ if [ $# -eq 0 ]; then
     echo -e '\E[32m'"Internal IP :" $tecreset $internalip
 
     # Check External IP
-    externalip=$(dig +short myip.opendns.com @resolver1.opendns.com)
-    echo -e '\E[32m'"External IP : $tecreset "$externalip
+    if hash dig 2>/dev/null; then
+        externalip=$(dig +short myip.opendns.com @resolver1.opendns.com)
+        echo -e '\E[32m'"External IP : $tecreset "$externalip
+    else
+        echo "External IP : command 'dig' was not found in PATH"
+    fi
 
     # Check DNS
     nameservers=$(cat /etc/resolv.conf | sed '1 d' | awk '{print $2}')
