@@ -32,9 +32,8 @@ show_version() {
     echo "Released Under Apache 2.0 License"
 }
 
-while getopts "ivuh?" name; do
+while getopts "vuh?" name; do
     case "$name" in
-        i) iopt=1;;
         v) show_version
            exit 0;;
         u) show_user=1;;
@@ -45,13 +44,6 @@ while getopts "ivuh?" name; do
            exit 0;;
     esac
 done
-
-if [ -n "$iopt" ]; then
-    wd=$(pwd)
-    basename "$(test -L "$0" && readlink "$0" || echo "$0")" > /tmp/scriptname
-    scriptname=$(echo -e -n $wd/ && cat /tmp/scriptname)
-    su -c "cp $scriptname /usr/bin/monitor" root && echo "Congratulations! Script Installed, now run monitor Command" || echo "Installation failed"
-fi
 
 monitor() {
 
