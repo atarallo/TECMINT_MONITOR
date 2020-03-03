@@ -16,12 +16,25 @@ clear
 # unset any variable which system may be using
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
 
-while getopts iv name
-do
-    case $name in
-        i)iopt=1;;
-        v)vopt=1;;
-        *)echo "Invalid arg";;
+SCRIPT_NAME="$BASH_SOURCE"
+help() {
+    echo "Usage:"
+    echo " $SCRIPT_NAME [-u] [-v] [-h]"
+    echo ""
+    echo "  -u  show users"
+    echo "  -v  show version"
+}
+
+while getopts "ivuh?" name; do
+    case "$name" in
+        i) iopt=1;;
+        v) vopt=1;;
+        u) show_user=1;;
+        h) help
+           exit 0;;
+        *) echo "Error! Invalid argument."
+           help
+           exit 0;;
     esac
 done
 
@@ -34,9 +47,10 @@ fi
 
 if [ -n "$vopt" ]; then
     echo -e "tecmint_monitor version 0.1\nDesigned by Tecmint.com\nReleased Under Apache 2.0 License"
+    exit 0
 fi
 
-if [ $# -eq 0 ]; then
+monitor() {
 
     # Define Variable tecreset
     tecreset=$(tput sgr0)
@@ -123,9 +137,12 @@ if [ $# -eq 0 ]; then
     nameservers=$(cat /etc/resolv.conf | sed '1 d' | awk '{print $2}')
     echo -e '\E[32m'"Name Servers :" $tecreset $nameservers
 
-    # Check Logged In Users
-    who>/tmp/who
-    echo -e '\E[32m'"Logged In users :" $tecreset && cat /tmp/who
+    if [ -n "$show_user" ]; then
+        # Check Logged In Users
+        who>/tmp/who
+        echo -e '\E[32m'"Logged In users :" $tecreset && cat /tmp/who
+        rm /tmp/who
+    fi
 
     # Check RAM and SWAP Usages
     free -h | grep -v + > /tmp/ramcache
@@ -151,7 +168,9 @@ if [ $# -eq 0 ]; then
     unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
 
     # Remove Temporary Files
-    rm /tmp/who /tmp/ramcache /tmp/diskusage
-fi
+    rm /tmp/ramcache /tmp/diskusage
+}
+
+monitor
 
 shift $(($OPTIND -1))
