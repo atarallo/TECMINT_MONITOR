@@ -128,7 +128,7 @@ monitor() {
     fi
 
     # Check DNS
-    nameservers=$(cat /etc/resolv.conf | sed '1 d' | awk '{print $2}' | tr "\n" ' ')
+    nameservers=$(grep -v '#' /etc/resolv.conf | awk '{print $2}' | tr "\n" ' ')
     msg "Name Servers" "$nameservers"
 
     if [ -n "$show_user" ]; then
@@ -141,9 +141,9 @@ monitor() {
     # Check RAM and SWAP Usages
     free -h | grep -v + > /tmp/ramcache
     msg "Ram Usages"
-    cat /tmp/ramcache | grep -v "Swap"
+    grep -v "Swap" /tmp/ramcache
     msg "Swap Usages"
-    cat /tmp/ramcache | grep -v "Mem"
+	grep -v "Mem"  /tmp/ramcache
 
     # Check Disk Usages
     hddisk=$(lsblk | grep disk | awk '{print $1}')
@@ -168,4 +168,4 @@ monitor() {
 
 monitor
 
-shift $(($OPTIND -1))
+shift $((OPTIND -1))
