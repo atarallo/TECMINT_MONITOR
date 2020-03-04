@@ -55,15 +55,9 @@ monitor() {
     echo -e '\E[32m'"Operating System Type :" $tecreset $os
 
     # Check OS Release Version and Name
-    ###################################
     OS=$(uname -s)
     REV=$(uname -r)
     MACH=$(uname -m)
-
-    GetVersionFromFile()
-    {
-        VERSION=$(cat $1 | tr "\n" ' ' | sed s/.*VERSION.*=\ // )
-    }
 
     if [ "${OS}" = "SunOS" ]; then
         OS=Solaris
@@ -97,11 +91,8 @@ monitor() {
         OSSTR="${OS} ${DIST} ${REV}(${PSEUDONAME} ${KERNEL} ${MACH})"
     fi
 
-    ##################################
-    #cat /etc/os-release | grep 'NAME\|VERSION' | grep -v 'VERSION_ID' | grep -v 'PRETTY_NAME' > /tmp/osrelease
-    #echo -n -e '\E[32m'"OS Name :" $tecreset && cat /tmp/osrelease | grep -v "VERSION" | grep -v CPE_NAME | cut -f2 -d\"
-    #echo -n -e '\E[32m'"OS Version :" $tecreset && cat /tmp/osrelease | grep -v "NAME" | grep -v CT_VERSION | cut -f2 -d\"
     echo -e '\E[32m'"OS Version :" $tecreset $OSSTR
+
     # Check Architecture
     architecture=$(uname -m)
     echo -e '\E[32m'"Architecture :" $tecreset $architecture
