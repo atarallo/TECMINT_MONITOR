@@ -71,7 +71,11 @@ monitor() {
         OSSTR="${OS} $(oslevel) ($(oslevel -r))"
     elif [ "${OS}" = "Linux" ]; then
         KERNEL=$(uname -r)
-        if [ -f /etc/redhat-release ]; then
+        if [ -f /etc/fedora-release ]; then
+            DIST='Fedora'
+            PSEUDONAME=$(cat /etc/fedora-release | sed s/.*\(// | sed s/\)//)
+            REV=$(cat /etc/fedora-release | sed s/.*release\ // | sed s/\ .*//)
+        elif [ -f /etc/redhat-release ]; then
             DIST='RedHat'
             PSEUDONAME=$(cat /etc/redhat-release | sed s/.*\(// | sed s/\)//)
             REV=$(cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//)
