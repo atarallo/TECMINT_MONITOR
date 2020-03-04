@@ -86,11 +86,14 @@ monitor() {
             DIST='Mandrake'
             PSEUDONAME=$(cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//)
             REV=$(cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//)
-        elif [ -f /etc/os-release ]; then
-            DIST=$(awk -F "PRETTY_NAME=" '{print $2}' /etc/os-release | tr -d '\n"')
         elif [ -f /etc/debian_version ]; then
+            DIST='Debian'
+            # PSEUDONAME=$(cat /etc/-release | sed s/.*\(// | sed s/\)//)
+            # REV=$(cat /etc/fedora-release | sed s/.*release\ // | sed s/\ .*//)
             DIST="Debian $(cat /etc/debian_version)"
             REV=""
+        elif [ -f /etc/os-release ]; then
+            DIST=$(awk -F "PRETTY_NAME=" '{print $2}' /etc/os-release | tr -d '\n"')
         fi
         if ${OSSTR} [ -f /etc/UnitedLinux-release ]; then
             DIST="${DIST}[$(cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//)]"
