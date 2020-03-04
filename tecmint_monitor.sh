@@ -9,6 +9,7 @@
 #                                                                                                  #
 ####################################################################################################
 
+VERSION='0.2'
 
 # clear the screen
 clear
@@ -26,8 +27,7 @@ help() {
 }
 
 show_version() {
-    version=0.1
-    printf "tecmint_monitor %s\n" "$version"
+    printf "tecmint_monitor %s\n" "$VERSION"
     printf "Designed by Tecmint.com\n"
     printf "Released Under Apache 2.0 License\n"
 }
