@@ -14,22 +14,22 @@
 clear
 
 # unset any variable which system may be using
-unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
+unset os_type architecture kernelrelease internalip externalip nameserver loadaverage
+
 
 SCRIPT_NAME="${BASH_SOURCE##*/}"
 help() {
-    echo "Usage:"
-    echo " $SCRIPT_NAME [-u] [-v] [-h]"
-    echo ""
-    echo "  -u  show users"
-    echo "  -v  show version"
+    printf "Usage:\n"
+    printf " %s [-u] [-v] [-h]\n\n" "$SCRIPT_NAME"
+    printf "  -u  show users\n"
+    printf "  -v  show version\n"
 }
 
 show_version() {
     version=0.1
-    echo "tecmint_monitor $version"
-    echo "Designed by Tecmint.com"
-    echo "Released Under Apache 2.0 License"
+    printf "tecmint_monitor %s\n" "$version"
+    printf "Designed by Tecmint.com\n"
+    printf "Released Under Apache 2.0 License\n"
 }
 
 while getopts "vuh?" name; do
@@ -39,20 +39,24 @@ while getopts "vuh?" name; do
         u) show_user=1;;
         h) help
            exit 0;;
-        *) echo "Error! Invalid argument."
+        *) printf "Error! Invalid argument.\n"
            help
            exit 0;;
     esac
 done
 
+GREEN="\E[32m"
+COLORRESET="\E[0m"
+
+msg() {
+    printf "%b$1 : %b $2\n" "$GREEN" "$COLORRESET"
+}
+
 monitor() {
 
-    # Define Variable tecreset
-    tecreset=$(tput sgr0)
-
     # Check OS Type
-    os=$(uname -o)
-    echo -e '\E[32m'"Operating System Type :" $tecreset $os
+    os_type=$(uname -o)
+    msg "Operating System Type" "${os_type}"
 
     # Check OS Release Version and Name
     OS=$(uname -s)
@@ -91,68 +95,72 @@ monitor() {
         OSSTR="${OS} ${DIST} ${REV}(${PSEUDONAME} ${KERNEL} ${MACH})"
     fi
 
-    echo -e '\E[32m'"OS Version :" $tecreset $OSSTR
+    msg "OS Version" "$OSSTR"
 
     # Check Architecture
     architecture=$(uname -m)
-    echo -e '\E[32m'"Architecture :" $tecreset $architecture
+    msg "Architecture" "$architecture"
 
     # Check Kernel Release
     kernelrelease=$(uname -r)
-    echo -e '\E[32m'"Kernel Release :" $tecreset $kernelrelease
+    msg "Kernel Release" "$kernelrelease"
 
     # Check hostname
-    echo -e '\E[32m'"Hostname :" $tecreset $HOSTNAME
+    msg "Hostname" "$HOSTNAME"
 
     # Check if connected to Internet or not
-    ping -c 1 google.com &> /dev/null && echo -e '\E[32m'"Internet: $tecreset Connected" || echo -e '\E[32m'"Internet: $tecreset Disconnected"
+    if ping -c 1 google.com &> /dev/null; then
+        msg "Internet" "Connected"
+    else
+        msg "Internet" "Disconnected"
+    fi
 
     # Check Internal IP
     internalip=$(hostname -I)
-    echo -e '\E[32m'"Internal IP :" $tecreset $internalip
+    msg "Internal IP" "$internalip"
 
     # Check External IP
     if hash dig 2>/dev/null; then
         externalip=$(dig +short myip.opendns.com @resolver1.opendns.com)
-        echo -e '\E[32m'"External IP : $tecreset "$externalip
+        msg "External IP" "$externalip"
     else
-        echo "External IP : command 'dig' was not found in PATH"
+        msg "External IP" "NOTE: command 'dig' was not found in PATH"
     fi
 
     # Check DNS
     nameservers=$(cat /etc/resolv.conf | sed '1 d' | awk '{print $2}' | tr "\n" ' ')
-    echo -e '\E[32m'"Name Servers :" $tecreset $nameservers
+    msg "Name Servers" "$nameservers"
 
     if [ -n "$show_user" ]; then
         # Check Logged In Users
         who>/tmp/who
-        echo -e '\E[32m'"Logged In users :" $tecreset && cat /tmp/who
+        msg "Logged In users" "\n$(cat /tmp/who)"
         rm /tmp/who
     fi
 
     # Check RAM and SWAP Usages
     free -h | grep -v + > /tmp/ramcache
-    echo -e '\E[32m'"Ram Usages :" $tecreset
+    msg "Ram Usages"
     cat /tmp/ramcache | grep -v "Swap"
-    echo -e '\E[32m'"Swap Usages :" $tecreset
+    msg "Swap Usages"
     cat /tmp/ramcache | grep -v "Mem"
 
     # Check Disk Usages
     hddisk=$(lsblk | grep disk | awk '{print $1}')
     df -h| grep "Filesystem\|/dev/${hddisk}*" > /tmp/diskusage
-    echo -e '\E[32m'"Disk Usages :" $tecreset
+    msg "Disk Usages"
     cat /tmp/diskusage
 
     # Check Load Average
-    echo -e '\E[32m'"Load Average :" $tecreset $loadaverage
     loadaverage=$(top -n 1 -b | grep "load average:" | awk '{print $(NF-2)" "$(NF-1)" "$NF}' | sed 's/, / /g')
+    msg "Load Average" "$loadaverage"
 
     # Check System Uptime
     tecuptime=$(uptime | awk '{print $3,$4}' | cut -f1 -d,)
-    echo -e '\E[32m'"System Uptime Days/(HH:MM) :" $tecreset $tecuptime
+    msg "System Uptime Days/(HH:MM)" "$tecuptime"
 
     # Unset Variables
-    unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
+    unset os architecture kernelrelease internalip externalip nameserver loadaverage
 
     # Remove Temporary Files
     rm /tmp/ramcache /tmp/diskusage
