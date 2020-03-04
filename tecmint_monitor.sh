@@ -120,7 +120,7 @@ monitor() {
     fi
 
     # Check DNS
-    nameservers=$(cat /etc/resolv.conf | sed '1 d' | awk '{print $2}')
+    nameservers=$(cat /etc/resolv.conf | sed '1 d' | awk '{print $2}' | tr "\n" ' ')
     echo -e '\E[32m'"Name Servers :" $tecreset $nameservers
 
     if [ -n "$show_user" ]; then
