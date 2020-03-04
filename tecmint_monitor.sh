@@ -56,7 +56,7 @@ monitor() {
 
     # Check OS Type
     os_type=$(uname -o)
-    msg "Operating System Type" "${os_type}"
+    msg "OS Type" "${os_type}"
 
     # Check OS Release Version and Name
     OS=$(uname -s)
@@ -102,7 +102,7 @@ monitor() {
         OSSTR="${OS} ${DIST} ${REV}(${PSEUDONAME} ${KERNEL} ${MACH})"
     fi
 
-    msg "OS Version" "$OSSTR"
+    msg "OS Description" "$OSSTR"
 
     # Check Architecture
     architecture=$(uname -m)
