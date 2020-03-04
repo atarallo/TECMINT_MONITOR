@@ -15,7 +15,8 @@ clear
 SCRIPT_NAME="${BASH_SOURCE##*/}"
 help() {
     printf "Usage:\n"
-    printf " %s [-u] [-v] [-h]\n\n" "$SCRIPT_NAME"
+    printf " %s [-u] [-v] [-h] [-c]\n\n" "$SCRIPT_NAME"
+    printf "  -c  use 'curl' to get external IP(only if unavailable 'dig')\n"
     printf "  -u  show users\n"
     printf "  -v  show version\n"
 }
@@ -27,13 +28,14 @@ show_version() {
     printf "Released Under Apache 2.0 License\n"
 }
 
-while getopts "vuh?" name; do
+while getopts "vuhc?" name; do
     case "$name" in
         v) show_version
            exit 0;;
         u) show_user=1;;
         h) help
            exit 0;;
+        c) use_curl=1;;
         *) printf "Error! Invalid argument.\n"
            help
            exit 0;;
@@ -121,10 +123,21 @@ monitor() {
 
     # Check External IP
     if hash dig 2>/dev/null; then
-        local EXTERNALIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
+        local externalip=$(dig +short myip.opendns.com @resolver1.opendns.com)
         msg "External IP" "$externalip"
     else
-        msg "External IP" "NOTE: command 'dig' was not found in PATH"
+        if ! hash curl 2>/dev/null; then
+            msg "External IP" "'curl' not available or not installed, fix prior running"
+        else
+            if [ -z "$use_curl" ]; then
+                msg "External IP" " - (see note)"
+                printf "Note: should install 'dig' (domain information groper) to get External IP\n"
+                printf "      or use key '-c' for use UNSAFE command: 'curl'\n"
+            else
+                local externalip="$(curl -s ipecho.net/plain) (NOTE: should install 'dig' for get External IP)"
+                msg "External IP" "$externalip"
+            fi
+        fi
     fi
 
     # Check DNS
