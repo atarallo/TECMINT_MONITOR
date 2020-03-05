@@ -22,7 +22,7 @@ help() {
 }
 
 show_version() {
-    local version='0.2'
+    local version='0.3'
     printf "tecmint_monitor %s\n" "$version"
     printf "Designed by Tecmint.com\n"
     printf "Released Under Apache 2.0 License\n"
