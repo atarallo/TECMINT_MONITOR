@@ -1,159 +1,153 @@
-                  ####################################################################################################
-                  #                                        Tecmint_monitor.sh                                        #
-                  # Written for Tecmint.com for the post www.tecmint.com/linux-server-health-monitoring-script/      #
-                  # If any bug, report us in the link below                                                          #
-                  # Free to use/edit/distribute the code below by                                                    #
-                  # giving proper credit to Tecmint.com and Author                                                   #
-                  #                                                                                                  #
-                  ####################################################################################################
-#! /bin/bash
-# unset any variable which system may be using
+#!/usr/bin/env bash
 
-unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
+####################################################################################################
+#                                        Tecmint_monitor.sh                                        #
+# Written for Tecmint.com for the post www.tecmint.com/linux-server-health-monitoring-script/      #
+# If any bug, report us in the link below                                                          #
+# Free to use/edit/distribute the code below by                                                    #
+# giving proper credit to Tecmint.com and Author                                                   #
+#                                                                                                  #
+####################################################################################################
 
-while getopts iv name
-do
-        case $name in
-          i)iopt=1;;
-          v)vopt=1;;
-          *)echo "Invalid arg";;
-        esac
+# Declare and assign separately to avoid masking return values (sh-shellcheck)
+# shellcheck disable=SC2155
+
+SCRIPT_NAME="${BASH_SOURCE##*/}"
+help() {
+    printf "Usage:\n"
+    printf " %s [-u] [-v] [-h] [-c]\n\n" "$SCRIPT_NAME"
+    printf "  -c  use 'curl' to get external IP(only if unavailable 'dig')\n"
+    printf "  -u  show users\n"
+    printf "  -v  show version\n"
+}
+
+show_version() {
+    local version='0.3'
+    printf "tecmint_monitor %s\n" "$version"
+    printf "Designed by Tecmint.com\n"
+    printf "Released Under Apache 2.0 License\n"
+}
+
+while getopts "vuhc?" name; do
+    case "$name" in
+        v) show_version
+           exit 0;;
+        u) show_user=1;;
+        h) help
+           exit 0;;
+        c) use_curl=1;;
+        *) printf "Error! Invalid argument.\n"
+           help
+           exit 0;;
+    esac
 done
 
-if [[ ! -z $iopt ]]
-then
-{
-wd=$(pwd)
-basename "$(test -L "$0" && readlink "$0" || echo "$0")" > /tmp/scriptname
-scriptname=$(echo -e -n $wd/ && cat /tmp/scriptname)
-su -c "cp $scriptname /usr/bin/monitor" root && echo "Congratulations! Script Installed, now run monitor Command" || echo "Installation failed"
-}
-fi
+msg() {
+    local green="\E[32m"
+    local colorreset="\E[0m"
 
-if [[ ! -z $vopt ]]
-then
-{
-echo -e "tecmint_monitor version 0.1\nDesigned by Tecmint.com\nReleased Under Apache 2.0 License"
-}
-fi
-
-if [[ $# -eq 0 ]]
-then
-{
-
-
-# Define Variable tecreset
-tecreset=$(tput sgr0)
-
-# Check if connected to Internet or not
-ping -c 1 google.com &> /dev/null && echo -e '\E[32m'"Internet: $tecreset Connected" || echo -e '\E[32m'"Internet: $tecreset Disconnected"
-
-# Check OS Type
-os=$(uname -o)
-echo -e '\E[32m'"Operating System Type :" $tecreset $os
-
-# Check OS Release Version and Name
-###################################
-OS=`uname -s`
-REV=`uname -r`
-MACH=`uname -m`
-
-GetVersionFromFile()
-{
-    VERSION=`cat $1 | tr "\n" ' ' | sed s/.*VERSION.*=\ // `
+    printf "%b$1 : %b $2\n" "$green" "$colorreset"
 }
 
-if [ "${OS}" = "SunOS" ] ; then
-    OS=Solaris
-    ARCH=`uname -p`
-    OSSTR="${OS} ${REV}(${ARCH} `uname -v`)"
-elif [ "${OS}" = "AIX" ] ; then
-    OSSTR="${OS} `oslevel` (`oslevel -r`)"
-elif [ "${OS}" = "Linux" ] ; then
-    KERNEL=`uname -r`
-    if [ -f /etc/redhat-release ] ; then
-        DIST='RedHat'
-        PSUEDONAME=`cat /etc/redhat-release | sed s/.*\(// | sed s/\)//`
-        REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//`
-    elif [ -f /etc/SuSE-release ] ; then
-        DIST=`cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//`
-        REV=`cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //`
-    elif [ -f /etc/mandrake-release ] ; then
-        DIST='Mandrake'
-        PSUEDONAME=`cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//`
-        REV=`cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//`
+monitor() {
+
+    msg "OS" "$(uname -o)"
+
+    local pretty_name=$(grep -e "^PRETTY" /etc/os-release | sed 's/PRETTY_NAME=//' | sed 's/\"//g')
+    msg "OS Name" "$pretty_name"
+
+    local os_release=''
+    if hash lsb_release 2>/dev/null; then
+        os_release=$(lsb_release -r | awk '{print $2}')
+    elif [ -f /etc/debian_version ]; then
+        os_release=$(cat /etc/debian_version)
+    elif [ -f /etc/redhat-release ]; then
+        os_release=$(sed 's/[^0-9]*//' /etc/redhat-release | sed 's/ .*//')
+    elif [ -f /etc/mandrake-release ]; then
+        os_release=$(sed 's/[^0-9]*//' /etc/mandrake-release | sed 's/ .*//')
+    elif [ -f /etc/system-release ]; then
+        os_release=$(sed 's/[^0-9]*//' /etc/system-release | sed 's/ .*//')
     elif [ -f /etc/os-release ]; then
-	DIST=`awk -F "PRETTY_NAME=" '{print $2}' /etc/os-release | tr -d '\n"'`
-    elif [ -f /etc/debian_version ] ; then
-        DIST="Debian `cat /etc/debian_version`"
-        REV=""
-
+        os_release=$(grep -e "^VERSION_ID=" /etc/os-release | sed 's/VERSION_ID=//' | sed 's/\"//g')
     fi
-    if ${OSSTR} [ -f /etc/UnitedLinux-release ] ; then
-        DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
+    msg "OS Release" "$os_release"
+
+    # Check Architecture
+    local architecture=$(uname -m)
+    msg "Architecture" "$architecture"
+
+    # Check Kernel Release
+    local kernelrelease=$(uname -r)
+    msg "Kernel Release" "$kernelrelease"
+
+    # Check hostname
+    msg "Hostname" "$HOSTNAME"
+
+    # Check if connected to Internet or not
+    if ping -c 1 google.com &> /dev/null; then
+        msg "Internet" "Connected"
+    else
+        msg "Internet" "Disconnected"
     fi
 
-    OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
+    # Check Internal IP
+    local internalip=$(hostname -I)
+    msg "Internal IP" "$internalip"
 
-fi
+    # Check External IP
+    if hash dig 2>/dev/null; then
+        local externalip=$(dig +short myip.opendns.com @resolver1.opendns.com)
+        msg "External IP" "$externalip"
+    else
+        if ! hash curl 2>/dev/null; then
+            msg "External IP" "'curl' not available or not installed, fix prior running"
+        else
+            if [ -z "$use_curl" ]; then
+                msg "External IP" " - (see note)"
+                printf "Note: should install 'dig' (domain information groper) to get External IP\n"
+                printf "      or use key '-c' for use UNSAFE command: 'curl'\n"
+            else
+                local externalip="$(curl -s ipecho.net/plain) (NOTE: should install 'dig' for get External IP)"
+                msg "External IP" "$externalip"
+            fi
+        fi
+    fi
 
-##################################
-#cat /etc/os-release | grep 'NAME\|VERSION' | grep -v 'VERSION_ID' | grep -v 'PRETTY_NAME' > /tmp/osrelease
-#echo -n -e '\E[32m'"OS Name :" $tecreset  && cat /tmp/osrelease | grep -v "VERSION" | grep -v CPE_NAME | cut -f2 -d\"
-#echo -n -e '\E[32m'"OS Version :" $tecreset && cat /tmp/osrelease | grep -v "NAME" | grep -v CT_VERSION | cut -f2 -d\"
-echo -e '\E[32m'"OS Version :" $tecreset $OSSTR 
-# Check Architecture
-architecture=$(uname -m)
-echo -e '\E[32m'"Architecture :" $tecreset $architecture
+    # Check DNS
+    local nameservers=$(grep -v '#' /etc/resolv.conf | awk '{print $2}' | tr "\n" ' ')
+    msg "Name Servers" "$nameservers"
 
-# Check Kernel Release
-kernelrelease=$(uname -r)
-echo -e '\E[32m'"Kernel Release :" $tecreset $kernelrelease
+    # Check Logged In Users
+    if [ -n "$show_user" ]; then
+        who>/tmp/who
+        msg "Logged In users" "\n$(cat /tmp/who)"
+        rm /tmp/who
+    fi
 
-# Check hostname
-echo -e '\E[32m'"Hostname :" $tecreset $HOSTNAME
+    # Check RAM and SWAP Usages
+    local tecm_ramcache=/tmp/ramcache
+    free -h | grep -v + > "$tecm_ramcache"
+    msg "Ram Usages"
+    grep -v "Swap" "$tecm_ramcache"
+    msg "Swap Usages"
+	grep -v "Mem"  "$tecm_ramcache"
+    rm "$tecm_ramcache"
 
-# Check Internal IP
-internalip=$(hostname -I)
-echo -e '\E[32m'"Internal IP :" $tecreset $internalip
+    # Check Disk Usages
+    local tecm_diskusage=/tmp/diskusage
+    local hddisk=$(lsblk | grep disk | awk '{print $1}')
+    df -h| grep "Filesystem\|/dev/${hddisk}*" > "$tecm_diskusage"
+    msg "Disk Usages"
+    cat "$tecm_diskusage"
+    rm "$tecm_diskusage"
 
-# Check External IP
-externalip=$(dig +short myip.opendns.com @resolver1.opendns.com)
-echo -e '\E[32m'"External IP : $tecreset "$externalip
+    # Check Load Average
+    local loadaverage=$(top -n 1 -b | grep "load average:" | awk '{print $(NF-2)" "$(NF-1)" "$NF}' | sed 's/, / /g')
+    msg "Load Average" "$loadaverage"
 
-# Check DNS
-nameservers=$(cat /etc/resolv.conf | sed '1 d' | awk '{print $2}')
-echo -e '\E[32m'"Name Servers :" $tecreset $nameservers 
-
-# Check Logged In Users
-who>/tmp/who
-echo -e '\E[32m'"Logged In users :" $tecreset && cat /tmp/who 
-
-# Check RAM and SWAP Usages
-free -h | grep -v + > /tmp/ramcache
-echo -e '\E[32m'"Ram Usages :" $tecreset
-cat /tmp/ramcache | grep -v "Swap"
-echo -e '\E[32m'"Swap Usages :" $tecreset
-cat /tmp/ramcache | grep -v "Mem"
-
-# Check Disk Usages
-df -h| grep 'Filesystem\|/dev/sda*' > /tmp/diskusage
-echo -e '\E[32m'"Disk Usages :" $tecreset 
-cat /tmp/diskusage
-
-# Check Load Average
-loadaverage=$(top -n 1 -b | grep "load average:" | awk '{print $10 $11 $12}')
-echo -e '\E[32m'"Load Average :" $tecreset $loadaverage
-
-# Check System Uptime
-tecuptime=$(uptime | awk '{print $3,$4}' | cut -f1 -d,)
-echo -e '\E[32m'"System Uptime Days/(HH:MM) :" $tecreset $tecuptime
-
-# Unset Variables
-unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
-
-# Remove Temporary Files
-rm /tmp/who /tmp/ramcache /tmp/diskusage
+    # Check System Uptime
+    local tecuptime=$(uptime | awk '{print $3,$4}' | cut -f1 -d,)
+    msg "System Uptime Days/(HH:MM)" "$tecuptime"
 }
-fi
-shift $(($OPTIND -1))
+
+monitor
