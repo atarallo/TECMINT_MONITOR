@@ -9,6 +9,9 @@
 #                                                                                                  #
 ####################################################################################################
 
+# Declare and assign separately to avoid masking return values (sh-shellcheck)
+# shellcheck disable=SC2155
+
 # clear the screen
 clear
 
