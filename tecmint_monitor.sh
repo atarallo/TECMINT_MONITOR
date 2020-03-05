@@ -12,9 +12,6 @@
 # Declare and assign separately to avoid masking return values (sh-shellcheck)
 # shellcheck disable=SC2155
 
-# clear the screen
-clear
-
 SCRIPT_NAME="${BASH_SOURCE##*/}"
 help() {
     printf "Usage:\n"
