@@ -53,51 +53,24 @@ monitor() {
 
     msg "OS" "$(uname -o)"
 
-    local nkernel=$(uname -s)
-    local krelease=$(uname -r)
-    local mach=$(uname -m)
-    local distr=''
-    local pseudoname=''
-    local os_info=''
+    local pretty_name=$(grep -e "^PRETTY" /etc/os-release | sed 's/PRETTY_NAME=//' | sed 's/\"//g')
+    msg "OS Name" "$pretty_name"
 
-    if [ "$nkernel" = "SunOS" ]; then
-        nkernel=Solaris
-        local arch=$(uname -p)
-        os_info="$nkernel $krelease($arch $(uname -v)"
-    elif [ "$nkernel" = "AIX" ]; then
-        os_info="$nkernel $(oslevel) ($(oslevel -r))"
-    elif [ "$nkernel" = "Linux" ]; then
-        nkernel=$(uname -r)
-        if [ -f /etc/fedora-release ]; then
-            distr='Fedora'
-            pseudoname=$(cat /etc/fedora-release | sed s/.*\(// | sed s/\)//)
-            krelease=$(cat /etc/fedora-release | sed s/.*release\ // | sed s/\ .*//)
-        elif [ -f /etc/redhat-release ]; then
-            distr='RedHat'
-            pseudoname=$(cat /etc/redhat-release | sed s/.*\(// | sed s/\)//)
-            krelease=$(cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//)
-        elif [ -f /etc/SuSE-release ]; then
-            distr=$(cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//)
-            krelease=$(cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //)
-        elif [ -f /etc/mandrake-release ]; then
-            distr='Mandrake'
-            pseudoname=$(cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//)
-            krelease=$(cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//)
-        elif [ -f /etc/debian_version ]; then
-            distr='Debian'
-            distr="Debian $(cat /etc/debian_version)"
-            krelease=""
-        elif [ -f /etc/os-release ]; then
-            distr=$(awk -F "PRETTY_NAME=" '{print $2}' /etc/os-release | tr -d '\n"')
-        fi
-        if [ -f /etc/UnitedLinux-release ]; then
-            distr="${distr}[$(cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//)]"
-        fi
-
-        os_info="$nkernel $distr $krelease($pseudoname $nkernel $mach)"
+    local os_release=''
+    if hash lsb_release 2>/dev/null; then
+        os_release=$(lsb_release -r | awk '{print $2}')
+    elif [ -f /etc/debian_version ]; then
+        os_release=$(cat /etc/debian_version)
+    elif [ -f /etc/redhat-release ]; then
+        os_release=$(sed 's/[^0-9]*//' /etc/redhat-release | sed 's/ .*//')
+    elif [ -f /etc/mandrake-release ]; then
+        os_release=$(sed 's/[^0-9]*//' /etc/mandrake-release | sed 's/ .*//')
+    elif [ -f /etc/system-release ]; then
+        os_release=$(sed 's/[^0-9]*//' /etc/system-release | sed 's/ .*//')
+    elif [ -f /etc/os-release ]; then
+        os_release=$(grep -e "^VERSION_ID=" /etc/os-release | sed 's/VERSION_ID=//' | sed 's/\"//g')
     fi
-
-    msg "OS Description" "$os_info"
+    msg "OS Release" "$os_release"
 
     # Check Architecture
     local architecture=$(uname -m)
