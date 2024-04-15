@@ -7,21 +7,26 @@
                   #                                                                                                  #
                   ####################################################################################################
 #! /bin/bash
+
+set -euo pipefail
+
 # unset any variable which system may be using
 
 unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
 
+opt=0
+
 while getopts ijv name
 do
         case $name in
-          i)iopt=1;;
-          v)vopt=1;;
-          j)jopt=1;;
+          i)opt="i";;
+          v)opt="v";;
+          j)opt="j";;
           *)echo "Invalid arg";;
         esac
 done
 
-if [[ ! -z $iopt ]]
+if [[ $opt == "i" ]]
 then
 {
 wd=$(pwd)
@@ -32,7 +37,7 @@ exit
 }
 fi
 
-if [[ ! -z $vopt ]]
+if [[ $opt == "v" ]]
 then
 {
 echo -e "tecmint_monitor version 0.3\nDesigned by Tecmint.com\nReleased Under Apache 2.0 License"
@@ -78,33 +83,34 @@ elif [ "${OS}" = "AIX" ] ; then
     OSSTR="${OS} `oslevel` (`oslevel -r`)"
 elif [ "${OS}" = "Linux" ] ; then
     KERNEL=`uname -r`
+    PSUEDONAME=""
+    REV=""
     if [ -f /etc/redhat-release ] ; then
         DIST='RedHat'
-        PSUEDONAME=`cat /etc/redhat-release | sed s/.*\(// | sed s/\)//`
-        REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//`
+        PSUEDONAME="`cat /etc/redhat-release | sed s/.*\(// | sed s/\)//` "
+        REV="`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//` "
     elif [ -f /etc/SuSE-release ] ; then
         DIST=`cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//`
         REV=`cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //`
     elif [ -f /etc/mandrake-release ] ; then
         DIST='Mandrake'
-        PSUEDONAME=`cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//`
-        REV=`cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//`
+        PSUEDONAME="`cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//` "
+        REV="`cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//` "
     elif [ -f /etc/os-release ]; then
         DIST=`awk -F "PRETTY_NAME=" '{print $2}' /etc/os-release | tr -d '\n"'`
     elif [ -f /etc/debian_version ] ; then
         DIST="Debian `cat /etc/debian_version`"
-        REV=""
     fi
-    if ${OSSTR} [ -f /etc/UnitedLinux-release ] ; then
+    if [ -f /etc/UnitedLinux-release ] ; then
         DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
     fi
-    OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
+    OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME}${KERNEL} ${MACH})"
 fi
-who 2>/dev/null > /tmp/who || SKIPWHO=1
+SKIPWHO=0 && who 2>/dev/null > /tmp/who || SKIPWHO=1
 (free -h 2>/dev/null || free )| grep -v + | grep -v Total: > /tmp/ramcache
 df -h| grep '^Filesystem\|^/dev/sd\|^/dev/mapper/\|^/dev/root\|^/dev/mm\|^overlay' > /tmp/diskusage
 
-if [[ ! -z $jopt ]]
+if [[ $opt == "j" ]]
 then
 {
 echo -n "{"
@@ -149,7 +155,7 @@ echo -e '\E[32m'"Operating System Type :" $tecreset $os
 #cat /etc/os-release | grep 'NAME\|VERSION' | grep -v 'VERSION_ID' | grep -v 'PRETTY_NAME' > /tmp/osrelease
 #echo -n -e '\E[32m'"OS Name :" $tecreset  && cat /tmp/osrelease | grep -v "VERSION" | grep -v CPE_NAME | cut -f2 -d\"
 #echo -n -e '\E[32m'"OS Version :" $tecreset && cat /tmp/osrelease | grep -v "NAME" | grep -v CT_VERSION | cut -f2 -d\"
-echo -e '\E[32m'"OS Version :" $tecreset $OSSTR 
+echo -e '\E[32m'"OS Version :" $tecreset $OSSTR
 # Check Architecture
 echo -e '\E[32m'"Architecture :" $tecreset $architecture
 
@@ -166,11 +172,11 @@ echo -e '\E[32m'"Internal IP :" $tecreset $internalip
 echo -e '\E[32m'"External IP : $tecreset "$externalip
 
 # Check DNS
-echo -e '\E[32m'"Name Servers :" $tecreset $nameservers 
+echo -e '\E[32m'"Name Servers :" $tecreset $nameservers
 
 if [[ $SKIPWHO != "1" ]];then
     # Check Logged In Users
-    echo -e '\E[32m'"Logged In users :" $tecreset && cat /tmp/who 
+    echo -e '\E[32m'"Logged In users :" $tecreset && cat /tmp/who
 fi
 
 # Check RAM and SWAP Usages
@@ -180,7 +186,7 @@ echo -e '\E[32m'"Swap Usages :" $tecreset
 cat /tmp/ramcache | grep -v "Mem" | awk -F'shared' '{print $1}'
 
 # Check Disk Usages
-echo -e '\E[32m'"Disk Usages :" $tecreset 
+echo -e '\E[32m'"Disk Usages :" $tecreset
 cat /tmp/diskusage
 
 # Check Load Average
