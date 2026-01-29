@@ -4,17 +4,25 @@ usage in Linux.
 
 # USAGE
 
-To execute the script please read its content, using in preference nano editor, and then 
+Script execution without parameter prints system health infomration.
 
 ```
 $ bash tecmin_monitor.sh 
 ```
-or you can install it, by downloading the script to the computer you want to monitor. Then give the appropiate permissions to the script using ```chmod``` command  and execute it like this : 
-```
-$./tecmint_monitor.sh -i
-```
 
 ![Shell Script to Monitor Linux System Health](http://www.tecmint.com/wp-content/uploads/2015/05/Linux-Health-Monitoring.png "Shell Script to Monitor Linux System Health")
+
+For JSON uptput use `-j` parameter.
+
+```
+$ bash tecmin_monitor.sh -j
+```
+
+For installation as admin user use `-i` parameter.
+
+```
+# bash tecmin_monitor.sh -i
+```
 
 You can check some basics informations about the script by executing : 
 ```
